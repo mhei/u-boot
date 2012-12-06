@@ -38,6 +38,7 @@
 #include <asm/arch/regs-timrot.h>
 #include <asm/arch/regs-usb.h>
 #include <asm/arch/regs-usbphy.h>
+#include <asm/arch/regs-uartapp.h>
 
 #ifdef CONFIG_MX23
 #include <asm/arch/regs-clkctrl-mx23.h>
