@@ -252,10 +252,11 @@ static int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		}
 		curr_device = dev;
 		if (mmc->part_config == MMCPART_NOAVAILABLE)
-			printf("mmc%d is current device\n", curr_device);
+			printf("%s %d is current device\n",
+				mmc->name, curr_device);
 		else
-			printf("mmc%d(part %d) is current device\n",
-				curr_device, mmc->part_num);
+			printf("%s %d(part %d) is current device\n",
+				mmc->name, curr_device, mmc->part_num);
 
 		return 0;
 	}
