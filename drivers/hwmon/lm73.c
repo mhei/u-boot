@@ -146,6 +146,8 @@ int dtt_init_one(int const sensor)
 	if (dtt_write(sensor, DTT_CONTROL, val))
 		return -1;
 
+	udelay(1000); /* allow bus to settle */
+
 	dtt_read(sensor, DTT_CONTROL);	/* clear temperature flags */
 	return 0;
 } /* dtt_init_one() */
