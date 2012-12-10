@@ -177,7 +177,8 @@ mxsmmc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 	}
 
 	/* See if card is present */
-	if (!mxsmmc_cd(priv)) {
+	if ((mmc->block_dev.removable) &&
+		(!mxsmmc_cd(priv))) {
 		printf("MMC%d: No card detected!\n", mmc->block_dev.dev);
 		return NO_CARD_ERR;
 	}
