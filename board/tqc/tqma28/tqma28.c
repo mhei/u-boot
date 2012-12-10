@@ -34,6 +34,7 @@
 #include <miiphy.h>
 #include <netdev.h>
 #include <errno.h>
+#include <mmc.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -87,9 +88,16 @@ static int tqma28_sd_wp(int id)
 int board_mmc_init(bd_t *bis)
 {
 	int ret = 0;
+	struct mmc *mmc;
 
 	ret = mxsmmc_initialize(bis, 0, NULL) |
 		mxsmmc_initialize(bis, 1, tqma28_sd_wp);
+
+	mmc = find_mmc_device(0);
+	if (!mmc)
+		printf("%s: MMC device 0 not found.\n",__func__);
+	else
+		mmc->block_dev.removable = 0;
 
 	/* Configure SD WP as input */
 	gpio_direction_input(MX28_PAD_GPMI_RESETN__GPIO_0_28);
