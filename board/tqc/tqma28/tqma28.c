@@ -44,13 +44,11 @@ int board_early_init_f(void)
 {
 	/* IO0 clock at 480MHz */
 	mx28_set_ioclk(MXC_IOCLK0, 480000);
-	/* IO1 clock at 480MHz */
-	mx28_set_ioclk(MXC_IOCLK1, 480000);
 
 	/* SSP0 clock at 96MHz */
 	mx28_set_sspclk(MXC_SSPCLK0, 96000, 0);
-	/* SSP2 clock at 96MHz */
-	mx28_set_sspclk(MXC_SSPCLK2, 96000, 0);
+	/* SSP1 clock at 96MHz */
+	mx28_set_sspclk(MXC_SSPCLK1, 96000, 0);
 
 #ifdef	CONFIG_CMD_USB
 	mxs_iomux_setup_pad(MX28_PAD_SSP2_SS1__USB1_OVERCURRENT);
