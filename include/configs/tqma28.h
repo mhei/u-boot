@@ -71,7 +71,7 @@
 #define CONFIG_CMD_NET
 #define CONFIG_CMD_NFS
 #define CONFIG_CMD_PING
-#define CONFIG_CMD_SPI
+//#define CONFIG_CMD_SPI /* cmd_spi uses full-duplex, not supported by mx28 */
 #define CONFIG_CMD_USB
 #define CONFIG_CMD_BOOTZ
 #define CONFIG_CMD_I2C
@@ -218,7 +218,7 @@
 #define CONFIG_SYS_DTT_MIN_TEMP	-100
 
 /*
- * SPI
+ * SPI - cmd_spi uses full-duplex, not supported by mx28
  */
 #ifdef CONFIG_CMD_SPI
 #define CONFIG_HARD_SPI
