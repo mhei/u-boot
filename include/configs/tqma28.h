@@ -80,6 +80,7 @@
 #define CONFIG_CMD_EEPROM
 #define CONFIG_CMD_DTT
 #define CONFIG_CMD_SETEXPR
+#define CONFIG_CMD_ITEST
 
 /*
  * Memory configurations
@@ -304,16 +305,16 @@
 	"root_loop="							\
 		"setenv start C000 && "					\
 		"setenv r1 $rootblks16 && "				\
-		"if test $r1 -gt 0x2D000; "				\
+		"if itest $r1 -gt 0x2D000; "				\
 		  "then setenv count 0x2D000; "				\
 		  "else setenv count $r1; "				\
 		"fi && "						\
-		"while test $r1 -gt 0; do "				\
+		"while itest $r1 -gt 0; do "				\
 		  "mmc dev 1 && mmc read $loadaddr $start $count && "	\
 		  "mmc dev 0 && mmc write $loadaddr $start $count && "	\
 		  "setexpr start $start + $count && "			\
-		  "setexpr r1 $r1 - 0x2D000 && "			\
-		  "if test $r1 -gt 0x2D000; "				\
+		  "setexpr r1 $r1 - $count && "				\
+		  "if itest $r1 -gt 0x2D000; "				\
 		    "then setenv count 2D000; "				\
 		    "else setenv count $r1; "				\
 		  "fi "							\
