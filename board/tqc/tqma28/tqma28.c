@@ -140,9 +140,6 @@ int board_eth_init(bd_t *bis)
 	writel(CLKCTRL_ENET_TIME_SEL_RMII_CLK | CLKCTRL_ENET_CLK_OUT_EN,
 					&clkctrl_regs->hw_clkctrl_enet);
 
-	/* Power-on FECs */
-	gpio_direction_output(MX28_PAD_SSP1_DATA3__GPIO_2_15, 0);
-
 	/* Reset FEC PHYs */
 	gpio_direction_output(MX28_PAD_ENET0_RX_CLK__GPIO_4_13, 0);
 	udelay(200);
