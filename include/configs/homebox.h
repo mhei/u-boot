@@ -36,8 +36,7 @@
 
 #define CONFIG_SYS_NO_FLASH
 #define CONFIG_BOARD_EARLY_INIT_F
-/* TODO: Implement late init function */
-/* #define CONFIG_BOARD_LATE_INIT */
+#define CONFIG_BOARD_LATE_INIT
 #define CONFIG_ARCH_MISC_INIT
 #define CONFIG_MISC_INIT_R
 
