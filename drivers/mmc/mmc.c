@@ -1301,7 +1301,7 @@ int mmc_init(struct mmc *mmc)
 
 	/* The internal partition reset to user partition(0) at every CMD0*/
 	mmc->part_num = 0;
-
+#if 0
 	/* Test for SD version 2 */
 	err = mmc_send_if_cond(mmc);
 
@@ -1317,7 +1317,15 @@ int mmc_init(struct mmc *mmc)
 			return UNUSABLE_ERR;
 		}
 	}
+#else
+	/* hide warnings about command timeouts */
+	err = mmc_send_op_cond(mmc);
 
+		if (err) {
+			printf("Card did not respond to voltage select!\n");
+			return UNUSABLE_ERR;
+		}
+#endif
 	err = mmc_startup(mmc);
 	if (err)
 		mmc->has_init = 0;
