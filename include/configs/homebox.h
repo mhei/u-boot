@@ -68,9 +68,9 @@
 #define CONFIG_CMD_NFS
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_SETEXPR
-#define CONFIG_CMD_SF
 #if 0
 #define CONFIG_CMD_SPI /* cmd_spi uses full-duplex, not supported by mx28 */
+#define CONFIG_CMD_SF
 #endif
 #if 0
 #define CONFIG_CMD_USB
