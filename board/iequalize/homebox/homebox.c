@@ -214,7 +214,7 @@ int misc_init_r(void)
 	char *s = getenv("serial");
 
 	if (s && s[0]) {
-		puts("IEQ S/N: ");
+		puts("Serial: ");
 		puts(s);
 		putc('\n');
 	}
