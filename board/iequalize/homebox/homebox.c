@@ -28,6 +28,7 @@
 #include <asm/io.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/iomux-mx28.h>
+#include <asm/imx-common/gpio.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <linux/mii.h>
@@ -36,7 +37,38 @@
 #include <errno.h>
 #include <mmc.h>
 
+#define SYSTEM_REV_OFFSET    0x8
+#define HW3REV0100 0x100
+#define HW3REV0200 0x200
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define MUX_CONFIG_REV (MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_PULLUP)
+#define MUX_CONFIG_LED (MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_NOPULL)
+
+
+/* LEDs on HW3 Rev 0100 */
+static const iomux_cfg_t leds_hw0100_pads[] = {
+	MX28_PAD_GPMI_RDY0__GPIO_0_20 | MUX_CONFIG_LED,
+	MX28_PAD_GPMI_RDN__GPIO_0_24 | MUX_CONFIG_LED,
+	MX28_PAD_GPMI_ALE__GPIO_0_26 | MUX_CONFIG_LED,
+};
+
+/* LEDs on HW3 Rev 0200 */
+static const iomux_cfg_t leds_hw0200_pads[] = {
+	MX28_PAD_LCD_D18__GPIO_1_18 | MUX_CONFIG_LED,
+	MX28_PAD_LCD_D19__GPIO_1_19 | MUX_CONFIG_LED,
+	MX28_PAD_LCD_D20__GPIO_1_20 | MUX_CONFIG_LED,
+	MX28_PAD_LCD_D21__GPIO_1_21 | MUX_CONFIG_LED,
+	MX28_PAD_LCD_D22__GPIO_1_22 | MUX_CONFIG_LED,
+	MX28_PAD_LCD_D23__GPIO_1_23 | MUX_CONFIG_LED,
+};
+
+static const iomux_cfg_t revision_pads[] = {
+	MX28_PAD_LCD_D05__GPIO_1_5 | MUX_CONFIG_REV,
+	MX28_PAD_LCD_D06__GPIO_1_6 | MUX_CONFIG_REV,
+	MX28_PAD_LCD_D07__GPIO_1_7 | MUX_CONFIG_REV,
+};
 
 /*
  * Functions
@@ -68,6 +100,67 @@ int board_init(void)
 	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
 
 	return 0;
+}
+
+static u32 system_rev;
+
+void board_rev_init(void)
+{
+	mxs_iomux_setup_multiple_pads(
+		revision_pads, ARRAY_SIZE(revision_pads));
+
+	/*
+	 * REV0100: all pins high     -> 111 -> 000 -> 0x0100
+	 * REV0200: PINID_LCD_D06 low -> 101 -> 010 -> 0x0200
+	 */
+	system_rev =
+		((!gpio_get_value(MX28_PAD_LCD_D05__GPIO_1_5)) << 2) |
+		((!gpio_get_value(MX28_PAD_LCD_D06__GPIO_1_6)) << 1) |
+		(!gpio_get_value(MX28_PAD_LCD_D07__GPIO_1_7));
+
+	if (system_rev == 0)
+		system_rev = 1;
+
+	system_rev <<= SYSTEM_REV_OFFSET;
+
+	/* Disable LEDs after reset ... */
+	switch (system_rev) {
+	case HW3REV0100:
+		mxs_iomux_setup_multiple_pads(
+			leds_hw0100_pads, ARRAY_SIZE(leds_hw0100_pads));
+		gpio_direction_output(MX28_PAD_GPMI_RDY0__GPIO_0_20, 0);
+		gpio_direction_output(MX28_PAD_GPMI_RDN__GPIO_0_24, 0);
+		gpio_direction_output(MX28_PAD_GPMI_ALE__GPIO_0_26, 0);
+		break;
+	case HW3REV0200:
+	default:
+		mxs_iomux_setup_multiple_pads(
+			leds_hw0200_pads, ARRAY_SIZE(leds_hw0200_pads));
+		gpio_direction_output(MX28_PAD_LCD_D18__GPIO_1_18, 0);
+		gpio_direction_output(MX28_PAD_LCD_D19__GPIO_1_19, 0);
+		gpio_direction_output(MX28_PAD_LCD_D20__GPIO_1_20, 0);
+		gpio_direction_output(MX28_PAD_LCD_D21__GPIO_1_21, 0);
+		gpio_direction_output(MX28_PAD_LCD_D22__GPIO_1_22, 0);
+		gpio_direction_output(MX28_PAD_LCD_D23__GPIO_1_23, 0);
+		break;
+	}
+
+	/* ... but switch on one to indicate a running bootloader */
+	switch (system_rev) {
+	case HW3REV0100:
+		gpio_set_value(MX28_PAD_GPMI_ALE__GPIO_0_26, 1);
+		break;
+	case HW3REV0200:
+	default:
+		gpio_set_value(MX28_PAD_LCD_D18__GPIO_1_18, 1);
+		gpio_set_value(MX28_PAD_LCD_D19__GPIO_1_19, 1);
+		break;
+   }
+}
+
+u32 get_board_rev(void)
+{
+	return system_rev;
 }
 
 #ifdef	CONFIG_CMD_MMC
@@ -125,5 +218,14 @@ int misc_init_r(void)
 		puts(s);
 		putc('\n');
 	}
+	return 0;
+}
+
+int board_late_init(void)
+{
+	board_rev_init();
+
+	printf("Revision: %04x\n", system_rev);
+
 	return 0;
 }
