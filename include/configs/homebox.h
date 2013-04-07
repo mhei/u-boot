@@ -130,9 +130,11 @@
 /* MMC Driver */
 #define CONFIG_ENV_IS_IN_MMC
 #ifdef CONFIG_ENV_IS_IN_MMC
- #define CONFIG_ENV_OFFSET	(0x400) /* 1 KB */
- #define CONFIG_ENV_SIZE	(0x20000 - 0x400) /* 127 KB */
- #define CONFIG_SYS_MMC_ENV_DEV 0
+ #define CONFIG_ENV_OFFSET		(0x400)			/*   1 KB */
+ #define CONFIG_ENV_SIZE		(0x20000 - 0x400)	/* 127 KB */
+ #define CONFIG_SYS_MMC_ENV_DEV		0
+ #define CONFIG_ENV_OFFSET_REDUND	(0x20400)		/* 129 KB */
+ #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
 #endif
 #define CONFIG_CMD_SAVEENV
 #ifdef	CONFIG_CMD_MMC
