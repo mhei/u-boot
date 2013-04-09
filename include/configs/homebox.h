@@ -226,11 +226,11 @@
         "ethaddr=02:c0:1d:c0:ff:ee\0"                                   \
         "linux1_start=1000\0"                                           \
         "linux2_start=2800\0"                                           \
-        "addether=setenv bootargs fec_mac=${ethaddr\\0"                 \
+        "addether=setenv bootargs fec_mac=${ethaddr}\0"                 \
         "addtty=setenv bootargs ${bootargs} console=${console_fsl},${baudrate}\0" \
         "addmisc=setenv bootargs ${bootargs} panic=1\0"                 \
-        "erase_mmc=mw.b ${loadaddr} 0 512; mmc write 0 ${loadaddr} 0 2\0"   \
-        "erase_env=mw.b ${loadaddr} 0 512; mmc write 0 ${loadaddr} 2 fc\0"  \
+        "erase_mmc=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 0 2\0"   \
+        "erase_env=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 2 fc\0"  \
         "addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk0p3 rootwait\0" \
         "boot_mmc=run addether addmmc addtty addmisc; "                 \
                 "mmc read 0 ${loadaddr} 800 1800; bootm\0"              \
