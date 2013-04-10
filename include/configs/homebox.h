@@ -208,6 +208,7 @@
 
 /*Boot Linux */
 #define CONFIG_CMDLINE_TAG
+#define CONFIG_REVISION_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_BOOTDELAY	1
 #define CONFIG_BOOTFILE	"uImage"
