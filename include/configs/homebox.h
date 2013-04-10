@@ -224,16 +224,16 @@
         "console_mainline=ttyAMA0\0"                                    \
         "kernel=uImage\0"                                               \
         "ethaddr=02:c0:1d:c0:ff:ee\0"                                   \
+        "bootsys=1\0"                                                   \
         "linux1_start=1000\0"                                           \
         "linux2_start=2800\0"                                           \
         "addether=setenv bootargs fec_mac=${ethaddr}\0"                 \
         "addtty=setenv bootargs ${bootargs} console=${console_fsl},${baudrate}\0" \
         "addmisc=setenv bootargs ${bootargs} panic=1\0"                 \
         "erase_mmc=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 0 2\0"   \
-        "erase_env=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 2 fc\0"  \
+        "erase_env1=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 2 7E\0"   \
+        "erase_env2=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 80 7E\0"  \
         "addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk0p3 rootwait\0" \
-        "boot_mmc=run addether addmmc addtty addmisc; "                 \
-                "mmc read 0 ${loadaddr} 800 1800; bootm\0"              \
         "addrootfs1=setenv bootargs ${bootargs} root=/dev/mmcblk0p5 rootwait bootsys=1\0" \
         "addrootfs2=setenv bootargs ${bootargs} root=/dev/mmcblk0p6 rootwait bootsys=2\0" \
         "mmc_sys1=run addether addrootfs1 addtty addmisc; "             \
