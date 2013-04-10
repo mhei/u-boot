@@ -118,6 +118,9 @@ void board_rev_init(void)
 		((!gpio_get_value(MX28_PAD_LCD_D06__GPIO_1_6)) << 1) |
 		(!gpio_get_value(MX28_PAD_LCD_D07__GPIO_1_7));
 
+	/* FIXME: gpio_get_value do not always detect correct revision */
+	system_rev = 2;
+
 	if (system_rev == 0)
 		system_rev = 1;
 
