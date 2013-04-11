@@ -86,6 +86,10 @@ int board_early_init_f(void)
 	/* SSP1 clock at 160MHz */
 	mxs_set_sspclk(MXC_SSPCLK2, 160000, 0);
 
+	/* the pads seem to have a long setup time, so do it early */
+	mxs_iomux_setup_multiple_pads(
+		revision_pads, ARRAY_SIZE(revision_pads));
+
 	return 0;
 }
 
@@ -106,9 +110,6 @@ static u32 system_rev;
 
 void board_rev_init(void)
 {
-	mxs_iomux_setup_multiple_pads(
-		revision_pads, ARRAY_SIZE(revision_pads));
-
 	/*
 	 * REV0100: all pins high     -> 111 -> 000 -> 0x0100
 	 * REV0200: PINID_LCD_D06 low -> 101 -> 010 -> 0x0200
