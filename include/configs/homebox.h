@@ -211,7 +211,17 @@
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_REVISION_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_BOOTDELAY	1
+
+#define CONFIG_BOOTDELAY		1 	/* autoboot after 1 second */
+#define CONFIG_BOOT_RETRY_TIME		120	/* retry autoboot after 120 secs */
+#define CONFIG_BOOT_RETRY_TIME_MIN	1	/* can go down to 1 second */
+#define CONFIG_AUTOBOOT_KEYED
+#define CONFIG_AUTOBOOT_PROMPT		"Autobooting in %d seconds, " \
+		"press <c> to stop\n", bootdelay
+#define CONFIG_AUTOBOOT_DELAY_STR	"\x63"	/* allows retry after retry time */
+#define CONFIG_AUTOBOOT_STOP_STR	" "	/* stop autoboot with <Space> */
+#define CONFIG_RESET_TO_RETRY			/* reset board to retry booting */
+
 #define CONFIG_BOOTFILE	"uImage"
 #define CONFIG_BOOTCOMMAND	"run find_bootsys"
 #define CONFIG_LOADADDR	0x42000000
