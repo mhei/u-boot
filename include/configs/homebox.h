@@ -23,6 +23,7 @@
 
 /* SoC configurations */
 #define CONFIG_MX28				/* i.MX28 SoC */
+#define CONFIG_TQMA28L				/* TQMa28L SoM */
 
 #define CONFIG_MXS_GPIO			/* GPIO control */
 #define CONFIG_SYS_HZ		1000		/* Ticks per second */
