@@ -34,7 +34,7 @@
 
 const iomux_cfg_t iomux_setup[] = {
 	/* DUART */
-	MX28_PAD_PWM0__DUART_RX,
+	MX28_PAD_PWM0__DUART_RX | MXS_PAD_PULLUP,
 	MX28_PAD_PWM1__DUART_TX,
 
 	/* MMC0 */
