@@ -240,6 +240,33 @@ static const char *get_cpu_rev(void)
 	}
 }
 
+static char *get_reset_cause(void)
+{
+	struct mxs_rtc_regs *rtc_regs = (struct mxs_rtc_regs *)MXS_RTC_BASE;
+	u32 reg;
+	char *cause;
+
+	reg = readl(&rtc_regs->hw_rtc_persistent0);
+	switch (reg & 3<<20) {
+	case 1:
+		cause = "thermal";
+		break;
+	case 2:
+		cause = "external";
+		break;
+	case 3:
+		cause = "ext. & therm.";
+		break;
+	default:
+		cause = "internal";
+	}
+	reg &= ~(3<<20);
+	writel(reg, &rtc_regs->hw_rtc_persistent0);
+
+	return cause;
+}
+
+
 int print_cpuinfo(void)
 {
 	struct mxs_spl_data *data = (struct mxs_spl_data *)
@@ -250,6 +277,7 @@ int print_cpuinfo(void)
 		get_cpu_rev(),
 		mxc_get_clock(MXC_ARM_CLK) / 1000000);
 	printf("BOOT:  %s\n", mxs_boot_modes[data->boot_mode_idx].mode);
+	printf("Reset: %s\n", get_reset_cause());
 	return 0;
 }
 #endif
