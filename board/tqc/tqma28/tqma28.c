@@ -183,6 +183,28 @@ int board_eth_init(bd_t *bis)
 
 #endif
 
+int tqma28_setup_rtc_clocksource(void)
+{
+#define HW_RTC_PERSISTENT0			(0x00000060)
+#define BM_RTC_PERSISTENT0_XTAL32_FREQ		(0x00000040)
+#define BM_RTC_PERSISTENT0_XTAL32KHZ_PWRUP	(0x00000020)
+#define BM_RTC_PERSISTENT0_CLOCKSOURCE		(0x00000001)
+	struct mxs_rtc_regs *rtc_regs = (struct mxs_rtc_regs *)MXS_RTC_BASE;
+	uint32_t persistent0;
+
+	persistent0 = readl(&rtc_regs->hw_rtc_persistent0);
+
+	persistent0 |= BM_RTC_PERSISTENT0_XTAL32KHZ_PWRUP |
+				BM_RTC_PERSISTENT0_CLOCKSOURCE;
+	persistent0 &= ~BM_RTC_PERSISTENT0_XTAL32_FREQ;
+
+	writel(persistent0, &rtc_regs->hw_rtc_persistent0);
+
+	printf("RTC: 32KHz xtal (persistent0 0x%08X)\n", persistent0);
+
+	return 0;
+}
+
 extern int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]);
 
 int misc_init_r(void)
@@ -203,6 +225,8 @@ int misc_init_r(void)
 
 	do_mmcops(NULL, 0, 3, mmccmd);
 	setenv("mmcdev", mmccmd[2]);
+
+	tqma28_setup_rtc_clocksource();
 
 	return 0;
 }
