@@ -27,6 +27,13 @@ extern unsigned tqma28_get_mmc_devid(void);
 
 #define CONFIG_TQMA28L
 #define CONFIG_MBA28
+
+#if defined(CONFIG_TQMA28L_AA)
+#define CONFIG_TQMA28L_VARIANT	"TQMa28L-AA"
+#else
+#define CONFIG_TQMA28L_VARIANT	"TQMa28L-AB"
+#endif
+
 /*
  * SoC configurations
  */
@@ -125,11 +132,11 @@ extern unsigned tqma28_get_mmc_devid(void);
 #define CONFIG_SYS_LONGHELP
 /* TODO: implement following definition */
 #ifdef CONFIG_TQMA28_RELEASE_REVISION
-#define CONFIG_SYS_PROMPT	("TQMa28L " \
+#define CONFIG_SYS_PROMPT	(CONFIG_TQMA28L_VARIANT \
 					MK_STR(CONFIG_TQMA28_RELEASE_REVISION) \
 					" U-Boot > ")
 #else
-#define CONFIG_SYS_PROMPT	"TQMa28L U-Boot > "
+#define CONFIG_SYS_PROMPT	(CONFIG_TQMA28L_VARIANT " U-Boot > ")
 #endif
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O buffer size */
 #define CONFIG_SYS_PBSIZE	\
@@ -251,6 +258,12 @@ extern unsigned tqma28_get_mmc_devid(void);
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
 #define CONFIG_OF_LIBFDT
 
+#if defined(CONFIG_TQMA28L_AA)
+#define CONFIG_TQMA28L_DTB	imx28-mba28l-aa.dtb
+#else
+#define CONFIG_TQMA28L_DTB	imx28-mba28l-ab.dtb
+#endif
+
 /*
  * Extra Environments
  *
@@ -265,7 +278,7 @@ extern unsigned tqma28_get_mmc_devid(void);
 	"lcdpanel=fg0700\0"						\
 	"kernel=zImage\0"						\
 	"uboot=u-boot.sb\0"						\
-	"dtb=imx28-mba28l.dtb\0"						\
+	"dtb=" MK_STR(CONFIG_TQMA28L_DTB) "\0"				\
 	"fdtaddr=0x41000000\0"						\
 	"rootblks16=0x20000\0"						\
 	"rootpath=/exports/nfsroot\0"					\

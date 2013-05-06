@@ -157,7 +157,7 @@ int board_eth_init(bd_t *bis)
 		return -EINVAL;
 	}
 
-#if 0	/* only TQMa28L-AA (i.MX287) */
+#if defined(CONFIG_TQMA28L_AA)
 	ret = fecmxc_initialize_multi(bis, 1, 3, MXS_ENET1_BASE);
 	if (ret) {
 		puts("FEC MXS: Unable to init FEC1\n");
