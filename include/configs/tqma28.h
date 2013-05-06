@@ -21,6 +21,10 @@
 
 #include <asm/arch/regs-base.h>
 
+#if !defined(__ASSEMBLY__)
+extern unsigned tqma28_get_mmc_devid(void);
+#endif
+
 #define CONFIG_TQMA28
 #define CONFIG_MBA28
 /*
@@ -155,12 +159,9 @@
  */
 #define CONFIG_ENV_IS_IN_MMC
 #ifdef CONFIG_ENV_IS_IN_MMC
- #define CONFIG_DYNAMIC_MMC_DEV		\
-			((((*(volatile unsigned int *)(GLOBAL_BOOT_MODE_ADDR)) \
-					& 0xF) == BOOT_MODE_SD1) ? 1 : 0)
  #define CONFIG_ENV_OFFSET	(0x400) /* 1 KB */
  #define CONFIG_ENV_SIZE	(0x20000 - 0x400) /* 127 KB */
- #define CONFIG_SYS_MMC_ENV_DEV	CONFIG_DYNAMIC_MMC_DEV
+ #define CONFIG_SYS_MMC_ENV_DEV	tqma28_get_mmc_devid()
 #endif
 #define CONFIG_CMD_SAVEENV
 #ifdef	CONFIG_CMD_MMC
