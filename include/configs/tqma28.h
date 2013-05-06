@@ -78,7 +78,9 @@ extern unsigned tqma28_get_mmc_devid(void);
 #if 0
 #define CONFIG_CMD_SPI /* cmd_spi uses full-duplex, not supported by mx28 */
 #endif
-#define CONFIG_CMD_USB
+#if 0
+#define CONFIG_CMD_USB /* disable USB support for minimum interface policy */
+#endif
 #define CONFIG_CMD_BOOTZ
 #define CONFIG_CMD_I2C
 #define CONFIG_CMD_EEPROM
