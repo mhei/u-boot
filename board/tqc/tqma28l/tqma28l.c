@@ -221,12 +221,10 @@ int tqma28_setup_rtc_clocksource(void)
 	return 0;
 }
 
-extern int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]);
-
 int misc_init_r(void)
 {
 	char *s = getenv("serial#");
-	char *mmccmd[3];
+	char *mmccmd[2];
 
 	if (s && s[0]) {
 		puts("Ser#:  ");
@@ -234,12 +232,11 @@ int misc_init_r(void)
 	}
 	putc('\n');
 
-	mmccmd[0] = "mmc";
-	mmccmd[1] = "dev";
-	mmccmd[2] = CONFIG_SYS_MMC_ENV_DEV?"1":"0";
+	mmccmd[0] = "mmc dev 0";
+	mmccmd[1] = "mmc dev 1";
 
-	do_mmcops(NULL, 0, 3, mmccmd);
-	setenv("mmcdev", mmccmd[2]);
+	run_command_list(mmccmd[CONFIG_SYS_MMC_ENV_DEV], -1, 0);
+	setenv("mmcdev", CONFIG_SYS_MMC_ENV_DEV?"1":"0");
 
 	tqma28_setup_rtc_clocksource();
 

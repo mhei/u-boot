@@ -40,10 +40,11 @@
 
 #include <common.h>
 #include <asm/arch/imx-regs.h>
+#include <serial.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
-static void auart_reset(void)
+static void mxs_auart_reset(void)
 {
 	int i;
 
@@ -65,7 +66,7 @@ static void auart_reset(void)
  * Set baud rate. The settings are always 8n1:
  * 8 data bits, no parity, 1 stop bit
  */
-void serial_setbrg(void)
+void mxs_serial_setbrg(void)
 {
 	u32 div;
 	u32 linectrl = 0;
@@ -80,17 +81,17 @@ void serial_setbrg(void)
 	REG_WR(MXS_UARTAPP_BASE, HW_UARTAPP_LINECTRL, linectrl);
 }
 
-int serial_init(void)
+int mxs_serial_init(void)
 {
 
 	/* Reset AURT */
-	auart_reset();
+	mxs_auart_reset();
 
 	/* Mask interrupts */
 	REG_WR(MXS_UARTAPP_BASE, HW_UARTAPP_INTR, 0);
 
 	/* Set default baudrate */
-	serial_setbrg();
+	mxs_serial_setbrg();
 
 	/*
 	 * Disable RTS/CTS, enable Rx, Tx, UART */
@@ -105,7 +106,7 @@ int serial_init(void)
 }
 
 /* Send a character */
-void serial_putc(const char c)
+void mxs_serial_putc(const char c)
 {
 	/* Wait for room in TX FIFO */
 	while (REG_RD(MXS_UARTAPP_BASE, HW_UARTAPP_STAT) &
@@ -116,17 +117,17 @@ void serial_putc(const char c)
 	REG_WR(MXS_UARTAPP_BASE, HW_UARTAPP_DATA, c);
 
 	if (c == '\n')
-		serial_putc('\r');
+		mxs_serial_putc('\r');
 }
 
-void serial_puts(const char *s)
+void mxs_serial_puts(const char *s)
 {
 	while (*s)
-		serial_putc(*s++);
+		mxs_serial_putc(*s++);
 }
 
 /* Test whether a character is in TX buffer */
-int serial_tstc(void)
+int mxs_serial_tstc(void)
 {
 	/* Check if RX FIFO is not empty */
 	return !(REG_RD(MXS_UARTAPP_BASE, HW_UARTAPP_STAT) &
@@ -134,13 +135,34 @@ int serial_tstc(void)
 }
 
 /* Receive character */
-int serial_getc(void)
+int mxs_serial_getc(void)
 {
 	/* Wait while RX FIFO is empty */
-	while (!serial_tstc())
+	while (!mxs_serial_tstc())
 		;
 
 	/* Read data byte */
 	return REG_RD(MXS_UARTAPP_BASE, HW_UARTAPP_DATA) & 0xff;
 }
 
+
+static struct serial_device mxs_serial_drv = {
+	.name	= "mxs_serial",
+	.start	= mxs_serial_init,
+	.stop	= NULL,
+	.setbrg	= mxs_serial_setbrg,
+	.putc	= mxs_serial_putc,
+	.puts	= default_serial_puts,
+	.getc	= mxs_serial_getc,
+	.tstc	= mxs_serial_tstc,
+};
+
+void mxs_serial_initialize(void)
+{
+	serial_register(&mxs_serial_drv);
+}
+
+__weak struct serial_device *default_serial_console(void)
+{
+	return &mxs_serial_drv;
+}
