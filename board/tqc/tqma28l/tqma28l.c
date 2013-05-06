@@ -92,9 +92,9 @@ unsigned tqma28_get_mmc_devid()
 					& 0xF) == BOOT_MODE_SD1) ? 1 : 0);
 }
 
-static int tqma28_sd_wp(int id)
+static int tqma28l_sd_wp(int id)
 {
-	if (id != 1) {
+	if (id != 0) {
 		printf("MXS MMC: Invalid card selected (card id = %d)\n", id);
 		return 1;
 	}
@@ -107,12 +107,12 @@ int board_mmc_init(bd_t *bis)
 	int ret = 0;
 	struct mmc *mmc;
 
-	ret = mxsmmc_initialize(bis, 0, NULL) |
-		mxsmmc_initialize(bis, 1, tqma28_sd_wp);
+	ret = mxsmmc_initialize(bis, 0, tqma28l_sd_wp) |
+		mxsmmc_initialize(bis, 1, NULL);
 
-	mmc = find_mmc_device(0);
+	mmc = find_mmc_device(1);
 	if (!mmc)
-		printf("%s: MMC device 0 not found.\n",__func__);
+		printf("%s: MMC device 1 not found.\n",__func__);
 	else
 		mmc->block_dev.removable = 0;
 
