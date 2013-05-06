@@ -204,7 +204,7 @@ static void mxs_mem_setup_vdda(void)
 		(struct mxs_power_regs *)MXS_POWER_BASE;
 
 	writel((0xc << POWER_VDDACTRL_TRG_OFFSET) |
-		(0x7 << POWER_VDDACTRL_BO_OFFSET_OFFSET) |
+		(0x4 << POWER_VDDACTRL_BO_OFFSET_OFFSET) |
 		POWER_VDDACTRL_LINREG_OFFSET_1STEPS_BELOW,
 		&power_regs->hw_power_vddactrl);
 }
