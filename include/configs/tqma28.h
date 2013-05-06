@@ -243,7 +243,7 @@ extern unsigned tqma28_get_mmc_devid(void);
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_BOOTDELAY	3
-#define CONFIG_BOOTFILE	"uImage"
+#define CONFIG_BOOTFILE	"zImage"
 #define CONFIG_BOOTCOMMAND	"run boot_ssp"
 #define CONFIG_LOADADDR	0x42000000
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
@@ -261,9 +261,9 @@ extern unsigned tqma28_get_mmc_devid(void);
 	"netdev=eth0\0"							\
 	"console=" MK_STR(CONFIG_SYS_LINUX_CONSOLE) "\0"		\
 	"lcdpanel=fg0700\0"						\
-	"kernel=uImage\0"						\
+	"kernel=zImage\0"						\
 	"uboot=u-boot.sb\0"						\
-	"dtb=imx28-tqma28.dtb\0"					\
+	"dtb=imx28-MBa28.dtb\0"						\
 	"fdtaddr=0x41000000\0"						\
 	"rootblks16=0x20000\0"						\
 	"rootpath=/exports/nfsroot\0"					\
@@ -343,11 +343,11 @@ extern unsigned tqma28_get_mmc_devid(void);
 									\
 	"boot_nfs=run addether addip addnfs addtty addlcd addmisc; "	\
 		"tftp $loadaddr $kernel; tftp $fdtaddr $dtb; "		\
-		"bootm $loadaddr - $fdtaddr\0"				\
+		"bootz $loadaddr - $fdtaddr\0"				\
 	"boot_ssp=run addether addip addmmc addtty addlcd addmisc; "	\
-		"mmc read $loadaddr 8000 3000; "			\
+		"mmc read $loadaddr 8000 4000; "			\
 		"mmc read $fdtaddr 3000 1000; "				\
-		"bootm $loadaddr - $fdtaddr\0"				\
+		"bootz $loadaddr - $fdtaddr\0"				\
 									\
 	"erase_env=mw.b $loadaddr 0 512; mmc write $loadaddr 2 1\0"	\
 									\
