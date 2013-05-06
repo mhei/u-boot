@@ -38,6 +38,16 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/* Defined in drivers/mmc/mxsmmc.c */
+struct mxsmmc_priv {
+	int			id;
+	struct mxs_ssp_regs	*regs;
+	uint32_t		buswidth;
+	int			(*mmc_is_wp)(int);
+	int			(*mmc_cd)(int);
+	struct mxs_dma_desc	*desc;
+};
+
 /*
  * Functions
  */
@@ -98,13 +108,25 @@ static int tqma28_sd_wp(int id)
 	return gpio_get_value(MX28_PAD_GPMI_RESETN__GPIO_0_28);
 }
 
+static int tqma28_sd_cd(int id)
+{
+	struct mmc *mmc = find_mmc_device(id);
+	struct mxs_ssp_regs *ssp_regs = ((struct mxsmmc_priv *)(mmc->priv))->regs;
+
+	if (mmc->block_dev.removable)
+		return !(readl(&ssp_regs->hw_ssp_status) &
+				SSP_STATUS_CARD_DETECT);
+	else
+		return -1;
+}
+
 int board_mmc_init(bd_t *bis)
 {
 	int ret = 0;
 	struct mmc *mmc;
 
-	ret = mxsmmc_initialize(bis, 0, NULL) |
-		mxsmmc_initialize(bis, 1, tqma28_sd_wp);
+	ret = mxsmmc_initialize(bis, 0, NULL, tqma28_sd_cd) |
+		mxsmmc_initialize(bis, 1, tqma28_sd_wp, tqma28_sd_cd);
 
 	mmc = find_mmc_device(0);
 	if (!mmc)
