@@ -64,6 +64,7 @@ extern unsigned tqma28_get_mmc_devid(void);
 #define CONFIG_SPL_LIBCOMMON_SUPPORT
 #define CONFIG_SPL_LIBGENERIC_SUPPORT
 #define CONFIG_SPL_GPIO_SUPPORT
+#define CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE
 
 /*
  * U-Boot Commands
