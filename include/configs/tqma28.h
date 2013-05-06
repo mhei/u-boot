@@ -19,8 +19,6 @@
 #ifndef __TQMA28_H
 #define __TQMA28_H
 
-#include <asm/arch/regs-base.h>
-
 #if !defined(__ASSEMBLY__)
 extern unsigned tqma28_get_mmc_devid(void);
 #endif
@@ -40,6 +38,8 @@ extern unsigned tqma28_get_mmc_devid(void);
 #endif
 
 #define CONFIG_MACH_TYPE	MACH_TYPE_TQMA28
+
+#include <asm/arch/regs-base.h>
 
 #define CONFIG_SYS_NO_FLASH
 #define CONFIG_SYS_ICACHE_OFF
