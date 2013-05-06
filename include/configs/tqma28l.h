@@ -274,11 +274,11 @@ extern unsigned tqma28_get_mmc_devid(void);
 #define	CONFIG_EXTRA_ENV_SETTINGS \
 	"rd_size=16384\0"						\
 	"netdev=eth0\0"							\
-	"console=" MK_STR(CONFIG_SYS_LINUX_CONSOLE) "\0"		\
+	"console=" __stringify(CONFIG_SYS_LINUX_CONSOLE) "\0"		\
 	"lcdpanel=fg0700\0"						\
 	"kernel=zImage\0"						\
 	"uboot=u-boot.sb\0"						\
-	"dtb=" MK_STR(CONFIG_TQMA28L_DTB) "\0"				\
+	"dtb=" __stringify(CONFIG_TQMA28L_DTB) "\0"			\
 	"fdtaddr=0x41000000\0"						\
 	"rootblks16=0x20000\0"						\
 	"rootpath=/exports/nfsroot\0"					\
