@@ -223,8 +223,7 @@ int misc_init_r(void)
 
 	mmccmd[0] = "mmc";
 	mmccmd[1] = "dev";
-	mmccmd[2] = (((((*(volatile unsigned int *)(GLOBAL_BOOT_MODE_ADDR)))
-			& 0xF) == BOOT_MODE_SD1) ? "1" : "0");
+	mmccmd[2] = CONFIG_DYNAMIC_MMC_DEV?"1":"0";
 
 	do_mmcops(NULL, 0, 3, mmccmd);
 	setenv("mmcdev", mmccmd[2]);
