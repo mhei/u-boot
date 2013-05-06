@@ -30,7 +30,12 @@
 #define CONFIG_MXS_GPIO			/* GPIO control */
 #define CONFIG_SYS_HZ		1000		/* Ticks per second */
 
-#define CONFIG_MACH_TYPE	MACH_TYPE_MX28EVK
+/* This should be removed after it's added into mach-types.h */
+#ifndef MACH_TYPE_TQMA28
+#define MACH_TYPE_TQMA28	4223
+#endif
+
+#define CONFIG_MACH_TYPE	MACH_TYPE_TQMA28
 
 #define CONFIG_SYS_NO_FLASH
 #define CONFIG_SYS_ICACHE_OFF
@@ -55,22 +60,24 @@
 #include <config_cmd_default.h>
 #define CONFIG_DISPLAY_CPUINFO
 #define CONFIG_DOS_PARTITION
+#define CONFIG_MISC_INIT_R
 
 #define CONFIG_CMD_CACHE
 #define CONFIG_CMD_DATE
 #define CONFIG_CMD_DHCP
-#define CONFIG_CMD_FAT
 #define CONFIG_CMD_GPIO
 #define CONFIG_CMD_MII
 #define CONFIG_CMD_MMC
 #define CONFIG_CMD_NET
 #define CONFIG_CMD_NFS
 #define CONFIG_CMD_PING
-#define CONFIG_CMD_SF
 #define CONFIG_CMD_SPI
 #define CONFIG_CMD_USB
 #define CONFIG_CMD_BOOTZ
 #define CONFIG_CMD_I2C
+#define CONFIG_CMD_EEPROM
+#define CONFIG_CMD_DTT
+#define CONFIG_CMD_SETEXPR
 
 /*
  * Memory configurations
@@ -105,7 +112,14 @@
  * U-Boot general configurations
  */
 #define CONFIG_SYS_LONGHELP
-#define CONFIG_SYS_PROMPT	"MX28EVK U-Boot > "
+/* TODO: implement following definition */
+#ifdef CONFIG_TQMA28_RELEASE_REVISION
+#define CONFIG_SYS_PROMPT	("TQMa28 " \
+					MK_STR(CONFIG_TQMA28_RELEASE_REVISION) \
+					" U-Boot > ")
+#else
+#define CONFIG_SYS_PROMPT	"TQMa28 U-Boot > "
+#endif
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O buffer size */
 #define CONFIG_SYS_PBSIZE	\
 	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
@@ -123,9 +137,10 @@
  */
 
 #define CONFIG_MXS_UARTAPP
-#define CONFIG_UARTAPP_CLK 24000000
-#define MXS_UARTAPP_BASE MXS_UARTAPP3_BASE
+#define CONFIG_UARTAPP_CLK		24000000
+#define MXS_UARTAPP_BASE		MXS_UARTAPP3_BASE
 #define CONFIG_BAUDRATE			115200	/* Default baud rate */
+#define CONFIG_SYS_LINUX_CONSOLE	ttyAPP3
 
 /*
  * DMA
@@ -137,8 +152,8 @@
  */
 #define CONFIG_ENV_IS_IN_MMC
 #ifdef CONFIG_ENV_IS_IN_MMC
- #define CONFIG_ENV_OFFSET	(256 * 1024)
- #define CONFIG_ENV_SIZE	(16 * 1024)
+ #define CONFIG_ENV_OFFSET	(0x400) /* 1 KB */
+ #define CONFIG_ENV_SIZE	(0x20000 - 0x400) /* 127 KB */
  #define CONFIG_SYS_MMC_ENV_DEV 0
 #endif
 #define CONFIG_CMD_SAVEENV
@@ -147,16 +162,6 @@
 #define CONFIG_GENERIC_MMC
 #define CONFIG_MMC_BOUNCE_BUFFER
 #define CONFIG_MXS_MMC
-#endif
-
-/*
- * NAND Driver
- */
-#ifdef CONFIG_CMD_NAND
-#define CONFIG_NAND_MXS
-#define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_SYS_NAND_BASE		0x60000000
-#define CONFIG_SYS_NAND_5_ADDR_CYCLE
 #endif
 
 /*
@@ -195,8 +200,22 @@
 #ifdef CONFIG_CMD_I2C
 #define CONFIG_I2C_MXS
 #define CONFIG_HARD_I2C
-#define CONFIG_SYS_I2C_SPEED	400000
+#define CONFIG_MXS_I2C_BASE	MXS_I2C1_BASE
+#define CONFIG_SYS_I2C_SPEED	100000
 #endif
+
+/* EEPROM */
+#define CONFIG_SYS_I2C_EEPROM_ADDR		0x50
+#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS	4
+#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN		2
+#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	5
+
+/* DTT */
+#define CONFIG_DTT_LM73		1
+#define CONFIG_DTT_SENSORS	{1}
+#define CONFIG_SYS_DTT_BUS_NUM	1
+#define CONFIG_SYS_DTT_MAX_TEMP	200
+#define CONFIG_SYS_DTT_MIN_TEMP	-100
 
 /*
  * SPI
@@ -207,31 +226,6 @@
 #define CONFIG_SPI_HALF_DUPLEX
 #define CONFIG_DEFAULT_SPI_BUS		2
 #define CONFIG_DEFAULT_SPI_MODE		SPI_MODE_0
-
-/* SPI Flash */
-#ifdef CONFIG_CMD_SF
-#define CONFIG_SPI_FLASH
-#define CONFIG_SF_DEFAULT_BUS	2
-#define CONFIG_SF_DEFAULT_CS	0
-/* this may vary and depends on the installed chip */
-#define CONFIG_SPI_FLASH_SST
-#define CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
-#define CONFIG_SF_DEFAULT_SPEED		24000000
-
-/* (redundant) environemnt in SPI flash */
-#undef CONFIG_ENV_IS_IN_SPI_FLASH
-#ifdef CONFIG_ENV_IS_IN_SPI_FLASH
-#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
-#define CONFIG_ENV_SIZE			0x1000		/* 4KB */
-#define CONFIG_ENV_OFFSET		0x40000		/* 256K */
-#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
-#define CONFIG_ENV_SECT_SIZE		0x1000
-#define CONFIG_ENV_SPI_CS		0
-#define CONFIG_ENV_SPI_BUS		2
-#define CONFIG_ENV_SPI_MAX_HZ		24000000
-#define CONFIG_ENV_SPI_MODE		SPI_MODE_0
-#endif
-#endif
 #endif
 
 /*
@@ -241,22 +235,133 @@
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_BOOTDELAY	3
 #define CONFIG_BOOTFILE	"uImage"
-#define CONFIG_BOOTCOMMAND	"run bootcmd_net"
+#define CONFIG_BOOTCOMMAND	"run boot_ssp"
 #define CONFIG_LOADADDR	0x42000000
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
 #define CONFIG_OF_LIBFDT
 
 /*
  * Extra Environments
+ *
+ * TODO: We still have to find out the amount of sectors consumed
+ * by the U-Boot image on sd card updates, so we can write the redundant copy
+ * behind the first. This number must be updated also in the MBR.
  */
-#define CONFIG_EXTRA_ENV_SETTINGS \
-	"console_fsl=console=ttyAM0" \
-	"console_mainline=console=ttyAMA0" \
-	"netargs=setenv bootargs console=${console_mainline}" \
-		"root=/dev/nfs " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot}\0" \
-	"bootcmd_net=echo Booting from net ...; " \
-		"run netargs; " \
-		"dhcp ${uimage}; bootm\0" \
+#define	CONFIG_EXTRA_ENV_SETTINGS \
+	"rd_size=16384\0"						\
+	"netdev=eth0\0"							\
+	"console=" MK_STR(CONFIG_SYS_LINUX_CONSOLE) "\0"		\
+	"lcdpanel=fg0700\0"						\
+	"kernel=uImage\0"						\
+	"uboot=u-boot.sb\0"						\
+	"dtb=imx28-tqma28.dtb\0"					\
+	"fdtaddr=0x41000000\0"						\
+	"rootblks16=0x20000\0"						\
+	"rootpath=/exports/nfsroot\0"					\
+	"ipmode=static\0"						\
+									\
+	"upd_uboot_net=tftp $uboot && "					\
+		"setexpr r1 $filesize / 0x200 && setexpr r1 $r1 + 1 && "\
+		"mmc dev 0 && mmc write $loadaddr 4001 $r1 && "		\
+		"mw 0x80056078 0x2 && "					\
+		"echo Copied U-Boot image from ethernet to emmc\0"	\
+	"upd_uboot_sd=mmc dev 1 && mmc read $loadaddr 4000 4000 && "	\
+		"mmc dev 0 && mmc write $loadaddr 4000 4000 && "	\
+		"mw 0x80056078 0x2 && "					\
+		"echo Copied U-Boot image from sd card to emmc\0"	\
+	"upd_kernel_net=tftp $kernel && "				\
+		"setexpr r1 $filesize / 0x200 && setexpr r1 $r1 + 1 && "\
+		"mmc dev 0 && mmc write $loadaddr 8000 $r1 && "		\
+		"echo Copied Kernel image from ethernet to emmc\0"	\
+	"upd_kernel_sd=mmc dev 1 && mmc read $loadaddr 8000 4000 && "	\
+		"mmc dev 0 && mmc write $loadaddr 8000 4000 && "	\
+		"echo Copied Kernel image from sd card to emmc\0"	\
+	"upd_fdt_net=tftp $dtb && "					\
+		"setexpr r1 $filesize / 0x200 && setexpr r1 $r1 + 1 && "\
+		"mmc dev 0 && mmc write $loadaddr 3000 $r1 && "		\
+		"echo Copied device tree blob from ethernet to emmc\0"	\
+	"upd_fdt_sd=mmc dev 1 && mmc read $loadaddr 3000 1000 && "	\
+		"mmc dev 0 && mmc write $loadaddr 3000 1000 && "	\
+		"echo Copied device tree blob from sd card to emmc\0"	\
+	"install_firmware="						\
+		"echo Downloading MBR... && "				\
+		"mmc dev 1 && mmc read $loadaddr 0 1 && "		\
+		"mmc dev 0 && mmc write $loadaddr 0 1 && "		\
+		"echo Installing device tree blob... && "		\
+		"mmc dev 1 && mmc read $loadaddr 3000 1000 && "		\
+		"mmc dev 0 && mmc write $loadaddr 3000 1000 && "	\
+		"echo Installing U-Boot... && "				\
+		"mmc dev 1 && mmc read $loadaddr 4000 4000 && "		\
+		"mmc dev 0 && mmc write $loadaddr 4000 4000 && "	\
+		"echo Installing Kernel... && "				\
+		"mmc dev 1 && mmc read $loadaddr 8000 4000 && "		\
+		"mmc dev 0 && mmc write $loadaddr 8000 4000 && "	\
+		"echo Installing Root FS (90 MiB chunks) && "		\
+		"run root_loop\0"					\
+									\
+	"root_loop="							\
+		"setenv start C000 && "					\
+		"setenv r1 $rootblks16 && "				\
+		"if test $r1 -gt 0x2D000; "				\
+		  "then setenv count 0x2D000; "				\
+		  "else setenv count $r1; "				\
+		"fi && "						\
+		"while test $r1 -gt 0; do "				\
+		  "mmc dev 1 && mmc read $loadaddr $start $count && "	\
+		  "mmc dev 0 && mmc write $loadaddr $start $count && "	\
+		  "setexpr start $start + $count && "			\
+		  "setexpr r1 $r1 - 0x2D000 && "			\
+		  "if test $r1 -gt 0x2D000; "				\
+		    "then setenv count 2D000; "				\
+		    "else setenv count $r1; "				\
+		  "fi "							\
+		"; done; setenv r1; setenv start; setenv count\0"	\
+									\
+	"addether=setenv bootargs $bootargs fec_mac=$ethaddr\0"		\
+	"addip_static=setenv bootargs $bootargs ip=$ipaddr:$serverip:"	\
+		"$gatewayip:$netmask:$hostname:$netdev:off\0"		\
+	"addip_dyn=setenv bootargs $bootargs ip=dhcp\0"			\
+	"addip=if test \"$ipmode\" != static; then "			\
+		"run addip_dyn; else run addip_static; fi\0"		\
+	"addlcd=setenv bootargs $bootargs lcd_panel=$lcdpanel\0"	\
+	"addmisc=setenv bootargs $bootargs ssp1 panic=1\0"		\
+	"addmmc=setenv bootargs $bootargs "				\
+		"root=/dev/mmcblk${mmcdev}p3 rw rootwait\0"		\
+	"addnfs=setenv bootargs $bootargs root=/dev/nfs rw "		\
+		"ramdisk_size=$rd_size "				\
+		"nfsroot=$serverip:$rootpath,v3,tcp\0"			\
+	"addtty=setenv bootargs $bootargs console=$console,$baudrate\0"	\
+									\
+	"boot_nfs=run addether addip addnfs addtty addlcd addmisc; "	\
+		"tftp $loadaddr $kernel; tftp $fdtaddr $dtb; "		\
+		"bootm $loadaddr - $fdtaddr\0"				\
+	"boot_ssp=run addether addip addmmc addtty addlcd addmisc; "	\
+		"mmc read $loadaddr 8000 3000; "			\
+		"mmc read $fdtaddr 3000 1000; "				\
+		"bootm $loadaddr - $fdtaddr\0"				\
+									\
+	"erase_env=mw.b $loadaddr 0 512; mmc write $loadaddr 2 1\0"	\
+									\
+	"ipaddr=172.168.135.170\0"					\
+	"serverip=172.168.135.107\0"					\
+	"netmask=255.255.255.0\0"					\
+	"ethaddr=02:00:01:00:00:01\0"					\
+	"n=run boot_nfs\0"						\
+	"mmc=mmc dev 0; setenv mmcdev 0; run boot_ssp\0"		\
+	"sd=mmc dev 1; setenv mmcdev 1; run boot_ssp\0"			\
+	"p=ping $serverip\0"
+
+/* The global boot mode will be detected by ROM code and
+ * a boot mode value will be stored at fixed address:
+ * TO1.0 addr 0x0001a7f0
+ * TO1.2 addr 0x00019BF0
+ */
+#ifndef MX28_EVK_TO1_0
+ #define GLOBAL_BOOT_MODE_ADDR 0x00019BF0
+#else
+ #define GLOBAL_BOOT_MODE_ADDR 0x0001a7f0
+#endif
+#define BOOT_MODE_SD0 0x9
+#define BOOT_MODE_SD1 0xa
 
 #endif /* __TQMA28_H */
