@@ -34,6 +34,8 @@
 
 const iomux_cfg_t iomux_setup[] = {
 	/* DUART */
+	/* Pins reserved for duart function as */
+	/* MX28 BootROM puts error codes there */
 	MX28_PAD_PWM0__DUART_RX,
 	MX28_PAD_PWM1__DUART_TX,
 
