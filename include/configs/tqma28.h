@@ -263,7 +263,7 @@ extern unsigned tqma28_get_mmc_devid(void);
 	"lcdpanel=fg0700\0"						\
 	"kernel=zImage\0"						\
 	"uboot=u-boot.sb\0"						\
-	"dtb=imx28-MBa28.dtb\0"						\
+	"dtb=imx28-mba28.dtb\0"						\
 	"fdtaddr=0x41000000\0"						\
 	"rootblks16=0x20000\0"						\
 	"rootpath=/exports/nfsroot\0"					\
