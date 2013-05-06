@@ -135,7 +135,9 @@ int board_eth_init(bd_t *bis)
 					&clkctrl_regs->hw_clkctrl_enet);
 
 	/* Reset FEC PHYs */
-	gpio_direction_output(MX28_PAD_ENET0_RX_CLK__GPIO_4_13, 0);
+	gpio_direction_output(MX28_PAD_ENET0_RX_CLK__GPIO_4_13, 1);
+	udelay(50);
+	gpio_set_value(MX28_PAD_ENET0_RX_CLK__GPIO_4_13, 0);
 	udelay(200);
 	gpio_set_value(MX28_PAD_ENET0_RX_CLK__GPIO_4_13, 1);
 
