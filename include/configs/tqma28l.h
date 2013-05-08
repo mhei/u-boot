@@ -173,7 +173,7 @@ extern unsigned tqma28_get_mmc_devid(void);
 #ifdef CONFIG_ENV_IS_IN_MMC
  #define CONFIG_ENV_OFFSET	(0x400) /* 1 KB */
  #define CONFIG_ENV_SIZE	(0x20000 - 0x400) /* 127 KB */
- #define CONFIG_SYS_MMC_ENV_DEV	tqma28_get_mmc_devid()
+ #define CONFIG_SYS_MMC_ENV_DEV	tqma28l_get_mmc_devid()
 #endif
 #define CONFIG_CMD_SAVEENV
 #ifdef	CONFIG_CMD_MMC

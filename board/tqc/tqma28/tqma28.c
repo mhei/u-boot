@@ -94,8 +94,23 @@ int board_init(void)
 
 unsigned tqma28_get_mmc_devid()
 {
-	return ((((*(volatile unsigned int *)(GLOBAL_BOOT_MODE_ADDR)) \
-					& 0xF) == BOOT_MODE_SD1) ? 1 : 0);
+	unsigned long boot_mode;
+	unsigned mmc_id;
+
+	boot_mode = (*(volatile unsigned int *)(GLOBAL_BOOT_MODE_ADDR)) & 0xF;
+
+	/*
+	 * Handle bug in combination with Freescale workaround
+	 * for ssp clock polarity issue:
+	 * When boot mode not set to sd card, look for environment on mmmc.
+	 * Booting spi/i2c devices thus loads emmc environment.
+	 */
+	if (boot_mode == BOOT_MODE_SD1)
+		mmc_id = 1;
+	else
+		mmc_id = 0;
+
+	return mmc_id;
 }
 
 static int tqma28_sd_wp(int id)
