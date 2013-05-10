@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013 IEQualize GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -25,7 +26,7 @@
 #define CONFIG_MX28				/* i.MX28 SoC */
 #define CONFIG_TQMA28L				/* TQMa28L SoM */
 
-#define CONFIG_MXS_GPIO			/* GPIO control */
+#define CONFIG_MXS_GPIO				/* GPIO control */
 #define CONFIG_SYS_HZ		1000		/* Ticks per second */
 
 /* This should be removed after it's added into mach-types.h */
@@ -123,7 +124,7 @@
 #define CONFIG_PL011_CLOCK		24000000
 #define CONFIG_PL01x_PORTS		{ (void *)MXS_UARTDBG_BASE }
 #define CONFIG_CONS_INDEX		0
-#define CONFIG_BAUDRATE         	115200  /* Default baud rate */
+#define CONFIG_BAUDRATE			115200  /* Default baud rate */
 
 /* DMA */
 #define CONFIG_APBH_DMA
@@ -138,7 +139,7 @@
  #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
 #endif
 #define CONFIG_CMD_SAVEENV
-#ifdef	CONFIG_CMD_MMC
+#ifdef CONFIG_CMD_MMC
 #define CONFIG_MMC
 #define CONFIG_GENERIC_MMC
 #define CONFIG_BOUNCE_BUFFER
@@ -147,8 +148,8 @@
 #define CONFIG_CMD_EXT4                 /* EXT4 Support */
 #endif
 
-/*Ethernet on SOC (FEC) */
-#ifdef	CONFIG_CMD_NET
+/* Ethernet on SOC (FEC) */
+#ifdef CONFIG_CMD_NET
 #define CONFIG_ETHPRIME		"FEC"
 #define CONFIG_FEC_MXC
 #define CONFIG_MII
@@ -173,7 +174,7 @@
 #define	CONFIG_RTC_MXS
 #endif
 
-/*USB */
+/* USB */
 #ifdef	CONFIG_CMD_USB
 #define	CONFIG_USB_EHCI
 #define	CONFIG_USB_EHCI_MXS
@@ -202,12 +203,12 @@
 #define CONFIG_DEFAULT_SPI_MODE		SPI_MODE_0
 #endif
 
-/*BOOTP options */
+/* BOOTP options */
 #define CONFIG_BOOTP_SUBNETMASK
 #define CONFIG_BOOTP_GATEWAY
 #define CONFIG_BOOTP_HOSTNAME
 
-/*Boot Linux */
+/* Boot Linux */
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_REVISION_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
@@ -222,65 +223,66 @@
 #define CONFIG_AUTOBOOT_STOP_STR	" "	/* stop autoboot with <Space> */
 #define CONFIG_RESET_TO_RETRY			/* reset board to retry booting */
 
-#define CONFIG_BOOTFILE	"uImage"
+#define CONFIG_BOOTFILE		"uImage"
 #define CONFIG_BOOTCOMMAND	"run find_bootsys"
-#define CONFIG_LOADADDR	0x42000000
+#define CONFIG_LOADADDR		0x42000000
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
 #define CONFIG_OF_LIBFDT
 
-/*Extra Environments */
+/* Extra Environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
-        "rd_size=16384\0"                                               \
-        "netdev=eth0\0"                                                 \
-        "console_fsl=ttyAM0\0"                                          \
-        "console_mainline=ttyAMA0\0"                                    \
-        "kernel=uImage\0"                                               \
-        "ethaddr=02:c0:1d:c0:ff:ee\0"                                   \
-        "bootsys=1\0"                                                   \
-        "linux1_start=1000\0"                                           \
-        "linux2_start=2800\0"                                           \
-        "addether=setenv bootargs fec_mac=${ethaddr}\0"                 \
-        "addtty=setenv bootargs ${bootargs} console=${console_fsl},${baudrate}\0" \
-        "addmisc=setenv bootargs ${bootargs} panic=1\0"                 \
-        "erase_mmc=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 0 2\0"   \
-        "erase_env1=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 2 7E\0"   \
-        "erase_env2=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 80 7E\0"  \
-        "addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk0p3 rootwait\0" \
-        "addrootfs1=setenv bootargs ${bootargs} root=/dev/mmcblk0p5 rootwait bootsys=1\0" \
-        "addrootfs2=setenv bootargs ${bootargs} root=/dev/mmcblk0p6 rootwait bootsys=2\0" \
-        "mmc_sys1=run addether addrootfs1 addtty addmisc; "             \
-		        "mmc read ${loadaddr} ${linux1_start} 1800; bootm\0"    \
-	    "mmc_sys2=run addether addrootfs2 addtty addmisc; "             \
-		        "mmc read ${loadaddr} ${linux2_start} 1800; bootm\0"    \
-	    "find_bootsys=echo starting bootscript; "                       \
-		"if test -n ${bootsys}; then "                                  \
-			"if test -n ${checksys}; then "                             \
-				"if test ${checksys} = 0; then "                        \
+		"rd_size=16384\0"                                               \
+		"netdev=eth0\0"                                                 \
+		"console_fsl=ttyAM0\0"                                          \
+		"console_mainline=ttyAMA0\0"                                    \
+		"kernel=uImage\0"                                               \
+		"ethaddr=02:c0:1d:c0:ff:ee\0"                                   \
+		"bootsys=1\0"                                                   \
+		"linux1_start=1000\0"                                           \
+		"linux2_start=2800\0"                                           \
+		"addether=setenv bootargs fec_mac=${ethaddr}\0"                 \
+		"addtty=setenv bootargs ${bootargs} console=${console_fsl},${baudrate}\0"         \
+		"addmisc=setenv bootargs ${bootargs} panic=1\0"                                   \
+		"erase_mmc=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 0 2\0"                   \
+		"erase_env1=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 2 7E\0"                 \
+		"erase_env2=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 80 7E\0"                \
+		"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk0p3 rootwait\0"               \
+		"addrootfs1=setenv bootargs ${bootargs} root=/dev/mmcblk0p5 rootwait bootsys=1\0" \
+		"addrootfs2=setenv bootargs ${bootargs} root=/dev/mmcblk0p6 rootwait bootsys=2\0" \
+		"mmc_sys1=run addether addrootfs1 addtty addmisc; "                               \
+				"mmc read ${loadaddr} ${linux1_start} 1800; bootm\0"              \
+		"mmc_sys2=run addether addrootfs2 addtty addmisc; "                               \
+				"mmc read ${loadaddr} ${linux2_start} 1800; bootm\0"              \
+		"find_bootsys=echo starting bootscript; "                                   \
+		"if test -n ${bootsys}; then "                                              \
+			"if test -n ${checksys}; then "                                     \
+				"if test ${checksys} = 0; then "                            \
 					"echo error booting the new system, "               \
 					"try to boot the old one; "                         \
 					"if test ${bootsys} = 1; then "                     \
-						"echo booting sys 2 && run mmc_sys2; "          \
+						"echo booting sys 2 && run mmc_sys2; "      \
 					"else "                                             \
-						"echo booting sys 1 && run mmc_sys1; "          \
+						"echo booting sys 1 && run mmc_sys1; "      \
 					"fi; "                                              \
-				"else "                                                 \
+				"else "                                                     \
 					"setenv checksys 0; saveenv; "                      \
-				"fi; "                                                  \
-			"fi; "                                                      \
-			"if test ${bootsys} = 1; then "                             \
-				"echo booting sys 1 && run mmc_sys1 || "                \
-				"echo booting alt. sys 2 && run mmc_sys2; "             \
-			"else "                                                     \
-				"if test ${bootsys} = 2; then "                         \
+				"fi; "                                                      \
+			"fi; "                                                              \
+			"if test ${bootsys} = 1; then "                                     \
+				"echo booting sys 1 && run mmc_sys1 || "                    \
+				"echo booting alt. sys 2 && run mmc_sys2; "                 \
+			"else "                                                             \
+				"if test ${bootsys} = 2; then "                             \
 					"echo booting sys 2 && run mmc_sys2 || "            \
 					"echo booting alt. sys 1 && run mmc_sys1; "         \
-				"fi; "                                                  \
-			"fi; "                                                      \
-		"else "                                                         \
-			"echo bootsys not set correctly; "                          \
+				"fi; "                                                      \
+			"fi; "                                                              \
+		"else "                                                                     \
+			"echo bootsys not set correctly; "                                  \
 		"fi\0"
 
-/* The global boot mode will be detected by ROM code and
+/*
+ * The global boot mode will be detected by ROM code and
  * a boot mode value will be stored at fixed address:
  * TO1.0 addr 0x0001a7f0
  * TO1.2 addr 0x00019BF0
