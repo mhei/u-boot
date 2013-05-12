@@ -78,6 +78,9 @@
 #endif
 #define CONFIG_CMD_BOOTZ
 #define CONFIG_CMD_ITEST
+#define CONFIG_CMD_UNZIP
+#define CONFIG_CMD_UNXZ
+#define CONFIG_XZ
 
 /* Memory configurations */
 #define CONFIG_NR_DRAM_BANKS		1		/* 1 bank of DRAM */
