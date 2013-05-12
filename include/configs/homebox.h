@@ -256,33 +256,33 @@
 				"mmc read ${loadaddr} ${linux1_start} 1800; bootm\0"              \
 		"mmc_sys2=run addether addrootfs2 addtty addmisc; "                               \
 				"mmc read ${loadaddr} ${linux2_start} 1800; bootm\0"              \
-		"find_bootsys=echo starting bootscript; "                                   \
-		"if test -n ${bootsys}; then "                                              \
-			"if test -n ${checksys}; then "                                     \
-				"if test ${checksys} = 0; then "                            \
-					"echo error booting the new system, "               \
-					"try to boot the old one; "                         \
-					"if test ${bootsys} = 1; then "                     \
-						"echo booting sys 2 && run mmc_sys2; "      \
-					"else "                                             \
-						"echo booting sys 1 && run mmc_sys1; "      \
-					"fi; "                                              \
-				"else "                                                     \
-					"setenv checksys 0; saveenv; "                      \
-				"fi; "                                                      \
-			"fi; "                                                              \
-			"if test ${bootsys} = 1; then "                                     \
-				"echo booting sys 1 && run mmc_sys1 || "                    \
-				"echo booting alt. sys 2 && run mmc_sys2; "                 \
-			"else "                                                             \
-				"if test ${bootsys} = 2; then "                             \
-					"echo booting sys 2 && run mmc_sys2 || "            \
-					"echo booting alt. sys 1 && run mmc_sys1; "         \
-				"fi; "                                                      \
-			"fi; "                                                              \
-		"else "                                                                     \
-			"echo bootsys not set correctly; "                                  \
-		"fi\0"
+		"find_bootsys=echo starting bootscript; "                                         \
+			"if test -n ${bootsys}; then "                                            \
+				"if test -n ${checksys}; then "                                   \
+					"if test ${checksys} = 0; then "                          \
+						"echo error booting the new system, "             \
+						"try to boot the old one; "                       \
+						"if test ${bootsys} = 1; then "                   \
+							"echo booting sys 2 && run mmc_sys2; "    \
+						"else "                                           \
+							"echo booting sys 1 && run mmc_sys1; "    \
+						"fi; "                                            \
+					"else "                                                   \
+						"setenv checksys 0; saveenv; "                    \
+					"fi; "                                                    \
+				"fi; "                                                            \
+				"if test ${bootsys} = 1; then "                                   \
+					"echo booting sys 1 && run mmc_sys1 || "                  \
+					"echo booting alt. sys 2 && run mmc_sys2; "               \
+				"else "                                                           \
+					"if test ${bootsys} = 2; then "                           \
+						"echo booting sys 2 && run mmc_sys2 || "          \
+						"echo booting alt. sys 1 && run mmc_sys1; "       \
+					"fi; "                                                    \
+				"fi; "                                                            \
+			"else "                                                                   \
+				"echo bootsys not set correctly; "                                \
+			"fi\0"
 
 /*
  * The global boot mode will be detected by ROM code and
