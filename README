@@ -231,6 +231,7 @@ Directory Hierarchy:
   /libfdt		Library files to support flattened device trees
   /lzma			Library files to support LZMA decompression
   /lzo			Library files to support LZO decompression
+  /xz			Library files to support XZ/LZMA2 decompression
 /net			Networking code
 /post			Power On Self Test
 /rtc			Real Time Clock drivers
@@ -1656,6 +1657,14 @@ CBFS (Coreboot Filesystem) support
 		Use the lzmainfo tool to determinate the lc and lp values and
 		then calculate the amount of needed dynamic memory (ensuring
 		the appropriate CONFIG_SYS_MALLOC_LEN value).
+
+		CONFIG_XZ
+
+		If this option is set, support for xz compressed
+		images is included.
+
+		XZ format is the next version of LZMA format. See also
+		the CONFIG_LZMA
 
 - MII/PHY support:
 		CONFIG_PHY_ADDR

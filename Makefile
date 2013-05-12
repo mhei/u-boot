@@ -239,6 +239,7 @@ HAVE_VENDOR_COMMON_LIB = $(if $(wildcard board/$(VENDOR)/common/Makefile),y,n)
 LIBS-y += lib/libgeneric.o
 LIBS-y += lib/lzma/liblzma.o
 LIBS-y += lib/lzo/liblzo.o
+LIBS-y += lib/xz/libxz.o
 LIBS-y += lib/zlib/libz.o
 LIBS-$(CONFIG_TIZEN) += lib/tizen/libtizen.o
 LIBS-$(HAVE_VENDOR_COMMON_LIB) += board/$(VENDOR)/common/lib$(VENDOR).o
