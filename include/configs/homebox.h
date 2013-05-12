@@ -227,7 +227,7 @@
 #define CONFIG_RESET_TO_RETRY			/* reset board to retry booting */
 
 #define CONFIG_BOOTFILE		"uImage"
-#define CONFIG_BOOTCOMMAND	"run find_bootsys"
+#define CONFIG_BOOTCOMMAND	"run find_bootsys; run start_nc"
 #define CONFIG_LOADADDR		0x42000000
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
 #define CONFIG_OF_LIBFDT
@@ -282,7 +282,9 @@
 				"fi; "                                                            \
 			"else "                                                                   \
 				"echo bootsys not set correctly; "                                \
-			"fi\0"
+			"fi\0"                                                                    \
+		"start_nc=echo starting netconsole; setenv ncip ${serverip}; "                    \
+			"setenv stdout nc; setenv stdin nc; version\0" 
 
 /*
  * The global boot mode will be detected by ROM code and
