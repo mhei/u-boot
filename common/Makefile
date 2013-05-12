@@ -174,6 +174,7 @@ COBJS-$(CONFIG_CMD_TSI148) += cmd_tsi148.o
 COBJS-$(CONFIG_CMD_UBI) += cmd_ubi.o
 COBJS-$(CONFIG_CMD_UBIFS) += cmd_ubifs.o
 COBJS-$(CONFIG_CMD_UNIVERSE) += cmd_universe.o
+COBJS-$(CONFIG_CMD_UNXZ) += cmd_unxz.o
 COBJS-$(CONFIG_CMD_UNZIP) += cmd_unzip.o
 ifdef CONFIG_CMD_USB
 COBJS-y += cmd_usb.o
