@@ -172,8 +172,6 @@
 #define XZ_IOBUF_SIZE 4096
 
 /*
- * This function implements the API defined in <linux/decompress/generic.h>.
- *
  * This wrapper will automatically choose single-call or multi-call mode
  * of the native XZ decoder API. The single-call mode can be used only when
  * both input and output buffers are available as a single chunk, i.e. when
@@ -184,7 +182,7 @@
  * DICT_MAX bytes, which will be allocated with vmalloc().
  */
 int XZ_FUNC unxz(unsigned char *in, int in_size,
-                 unsigned char *out, int *in_used)
+                 unsigned char *out, int *out_size)
 {
 	struct xz_buf b;
 	struct xz_dec *s;
@@ -203,15 +201,15 @@ int XZ_FUNC unxz(unsigned char *in, int in_size,
 	b.in_size = in_size;
 	b.out_pos = 0;
 
-	if (in_used != NULL)
-		*in_used = 0;
+	if (out_size != NULL)
+		*out_size = 0;
 
 	b.out = out;
 	b.out_size = (size_t)-1;
 	ret = xz_dec_run(s, &b);
 
-	if (in_used != NULL)
-		*in_used += b.in_pos;
+	if (out_size != NULL)
+		*out_size = b.out_pos;
 
 	xz_dec_end(s);
 

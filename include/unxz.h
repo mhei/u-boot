@@ -11,6 +11,6 @@
 #ifndef DECOMPRESS_UNXZ_H
 #define DECOMPRESS_UNXZ_H
 
-int unxz(unsigned char *in, int in_size, unsigned char *out, int *in_used);
+int unxz(unsigned char *in, int in_size, unsigned char *out, int *out_size);
 
 #endif
