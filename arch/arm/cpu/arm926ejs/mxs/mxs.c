@@ -248,13 +248,13 @@ static char *get_reset_cause(void)
 
 	reg = readl(&rtc_regs->hw_rtc_persistent0);
 	switch (reg & 3<<20) {
-	case 1:
+	case RTC_PERSISTENT0_THERMAL_RESET:
 		cause = "thermal";
 		break;
-	case 2:
+	case RTC_PERSISTENT0_EXTERNAL_RESET:
 		cause = "external";
 		break;
-	case 3:
+	case RTC_PERSISTENT0_THERMAL_RESET & RTC_PERSISTENT0_EXTERNAL_RESET:
 		cause = "ext. & therm.";
 		break;
 	default:
