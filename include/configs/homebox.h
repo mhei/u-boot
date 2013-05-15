@@ -227,7 +227,7 @@
 #define CONFIG_RESET_TO_RETRY			/* reset board to retry booting */
 
 #define CONFIG_BOOTFILE		"uImage"
-#define CONFIG_BOOTCOMMAND	"run find_bootsys; run start_nc"
+#define CONFIG_BOOTCOMMAND	"run resetconsole; run find_bootsys; run start_nc"
 #define CONFIG_LOADADDR		0x42000000
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
 #define CONFIG_OF_LIBFDT
@@ -261,7 +261,7 @@
 				"if test -n ${checksys}; then "                                   \
 					"if test ${checksys} = 0; then "                          \
 						"echo error booting the new system, "             \
-						"try to boot the old one; "                       \
+						     "trying to boot the old one; "               \
 						"if test ${bootsys} = 1; then "                   \
 							"echo booting sys 2 && run mmc_sys2; "    \
 						"else "                                           \
@@ -283,8 +283,12 @@
 			"else "                                                                   \
 				"echo bootsys not set correctly; "                                \
 			"fi\0"                                                                    \
-		"start_nc=echo starting netconsole; setenv ncip ${serverip}; "                    \
-			"setenv stdout nc; setenv stdin nc; version\0" 
+		"serialconsole=setenv stderr serial; setenv stdout serial; setenv stdin serial\0" \
+		"netconsole=setenv stderr nc; setenv stdout nc; setenv stdin nc\0"                \
+		"resetconsole=if test ${stdout} = 'nc'; then run serialconsole; saveenv; fi\0"    \
+		"ncip=192.168.9.133\0"                                                            \
+		"start_nc=if test ${ethaddr} != '02:c0:1d:c0:ff:ee'; then "                       \
+			"echo starting netconsole; run netconsole; version; fi\0"
 
 /*
  * The global boot mode will be detected by ROM code and
