@@ -288,7 +288,21 @@
 		"resetconsole=if test ${stdout} = 'nc'; then run serialconsole; saveenv; fi\0"    \
 		"ncip=192.168.9.133\0"                                                            \
 		"start_nc=if test ${ethaddr} != '02:c0:1d:c0:ff:ee'; then "                       \
-			"echo starting netconsole; run netconsole; version; fi\0"
+			"echo starting netconsole; run netconsole; version; fi\0"                 \
+		"start_deploy="                                                                   \
+			"mw.l ${loadaddr} efbeadde 80; "                                          \
+			"mmc write ${loadaddr} 44030 1; "                                         \
+			"tftp ${loadaddr} openwrt-mxs-homebox-root.ext4.xz; "                     \
+			"unxz ${loadaddr} ${filesize} 43000000; "                                 \
+			"setexpr fsize ${filesize} + 1ff; "                                       \
+			"setexpr fsize ${fsize} / 200; "                                          \
+			"mmc write 43000000 4010 ${fsize}; "                                      \
+			"mmc write 43000000 24020 ${fsize}; "                                     \
+			"tftp ${loadaddr} openwrt-mxs-homebox-uImage; "                           \
+			"setexpr fsize ${filesize} + 1ff; "                                       \
+			"setexpr fsize ${fsize} / 200; "                                          \
+			"mmc write ${loadaddr} ${linux2_start} ${fsize}; "                        \
+			"mmc write ${loadaddr} ${linux1_start} ${fsize}\0"
 
 /*
  * The global boot mode will be detected by ROM code and
