@@ -216,8 +216,8 @@
 #define CONFIG_REVISION_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 
-#define CONFIG_BOOTDELAY		1 	/* autoboot after 1 second */
-#define CONFIG_BOOT_RETRY_TIME		120	/* retry autoboot after 120 secs */
+#define CONFIG_BOOTDELAY		5	/* autoboot after 5 seconds */
+#define CONFIG_BOOT_RETRY_TIME		120	/* retry autoboot after 120 seconds */
 #define CONFIG_BOOT_RETRY_TIME_MIN	1	/* can go down to 1 second */
 #define CONFIG_AUTOBOOT_KEYED
 #define CONFIG_AUTOBOOT_PROMPT		"Autobooting in %d seconds, " \
