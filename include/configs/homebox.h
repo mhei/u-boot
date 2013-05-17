@@ -286,8 +286,9 @@
 		"serialconsole=setenv stderr serial; setenv stdout serial; setenv stdin serial\0" \
 		"netconsole=setenv stderr nc; setenv stdout nc; setenv stdin nc\0"                \
 		"resetconsole=if test ${stdout} = 'nc'; then run serialconsole; saveenv; fi\0"    \
+		"netconsole_enabled=1\0"                                                          \
 		"ncip=192.168.9.133\0"                                                            \
-		"start_nc=if test ${ethaddr} != '02:c0:1d:c0:ff:ee'; then "                       \
+		"start_nc=if test ${netconsole_enabled} = 1; then "                               \
 			"echo starting netconsole; run netconsole; version; fi\0"                 \
 		"start_deploy="                                                                   \
 			"mw.l ${loadaddr} efbeadde 80; "                                          \
