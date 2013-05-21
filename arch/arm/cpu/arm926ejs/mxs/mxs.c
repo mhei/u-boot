@@ -295,6 +295,16 @@ int do_mx28_showclocks(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
  * Initializes on-chip ethernet controllers.
  */
 #if defined(CONFIG_MX28) && defined(CONFIG_CMD_NET)
+
+/*
+ * Enable pad output by default. If a board uses an external crystal,
+ * then board code should define this function and return zero.
+ */
+__weak int mxs_eth_enable_clock_out(void)
+{
+	return 1;
+}
+
 int cpu_eth_init(bd_t *bis)
 {
 	struct mxs_clkctrl_regs *clkctrl_regs =
@@ -316,7 +326,8 @@ int cpu_eth_init(bd_t *bis)
 		&clkctrl_regs->hw_clkctrl_pll2ctrl0_clr);
 
 	/* Enable pad output */
-	setbits_le32(&clkctrl_regs->hw_clkctrl_enet, CLKCTRL_ENET_CLK_OUT_EN);
+	if (mxs_eth_enable_clock_out())
+		setbits_le32(&clkctrl_regs->hw_clkctrl_enet, CLKCTRL_ENET_CLK_OUT_EN);
 
 	return 0;
 }
