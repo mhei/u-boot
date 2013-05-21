@@ -327,19 +327,15 @@ extern unsigned tqma28_get_mmc_devid(void);
 	"root_loop="							\
 		"setenv start C000 && "					\
 		"setenv r1 $rootblks16 && "				\
-		"if itest $r1 -gt 0x2D000; "				\
-		  "then setenv count 0x2D000; "				\
-		  "else setenv count $r1; "				\
-		"fi && "						\
 		"while itest $r1 -gt 0; do "				\
-		  "mmc dev 0 && mmc read $loadaddr $start $count && "	\
-		  "mmc dev 1 && mmc write $loadaddr $start $count && "	\
-		  "setexpr start $start + $count && "			\
-		  "setexpr r1 $r1 - $count && "				\
 		  "if itest $r1 -gt 0x2D000; "				\
 		    "then setenv count 2D000; "				\
 		    "else setenv count $r1; "				\
-		  "fi "							\
+		  "fi && "						\
+		  "mmc dev 0 && mmc read $loadaddr $start $count && "	\
+		  "mmc dev 1 && mmc write $loadaddr $start $count && "	\
+		  "setexpr start $start + $count && "			\
+		  "setexpr r1 $r1 - $count"				\
 		"; done; setenv r1; setenv start; setenv count\0"	\
 									\
 	"addether=setenv bootargs $bootargs fec_mac=$ethaddr\0"		\
