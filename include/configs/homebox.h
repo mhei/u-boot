@@ -227,7 +227,7 @@
 #define CONFIG_RESET_TO_RETRY			/* reset board to retry booting */
 
 #define CONFIG_BOOTFILE		"uImage"
-#define CONFIG_BOOTCOMMAND	"run resetconsole; run find_bootsys; run start_nc"
+#define CONFIG_BOOTCOMMAND	"run find_bootsys; run start_nc"
 #define CONFIG_LOADADDR		0x42000000
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
 #define CONFIG_OF_LIBFDT
@@ -285,8 +285,7 @@
 			"fi\0"                                                                    \
 		"serialconsole=setenv stderr serial; setenv stdout serial; setenv stdin serial\0" \
 		"netconsole=setenv stderr nc; setenv stdout nc; setenv stdin nc\0"                \
-		"resetconsole=if test ${stdout} = 'nc'; then run serialconsole; saveenv; fi\0"    \
-		"netconsole_enabled=1\0"                                                          \
+		"netconsole_enabled=0\0"                                                          \
 		"ncip=192.168.9.133\0"                                                            \
 		"start_nc=if test ${netconsole_enabled} = 1; then "                               \
 			"echo starting netconsole; run netconsole; version; fi\0"                 \
