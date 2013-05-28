@@ -216,6 +216,9 @@ int board_eth_init(bd_t *bis)
 	udelay(200);
 	gpio_set_value(GPIO_PHY_RESET, 1);
 
+	/* give PHY some time to get out of the reset */
+	udelay(10000);
+
 	ret = fecmxc_initialize(bis);
 	if (ret) {
 		puts("FEC MXS: Unable to init FEC\n");
