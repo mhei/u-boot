@@ -50,6 +50,7 @@
 #define CONFIG_SPL_LIBCOMMON_SUPPORT
 #define CONFIG_SPL_LIBGENERIC_SUPPORT
 #define CONFIG_SPL_GPIO_SUPPORT
+#define CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE
 
 /* U-Boot Commands */
 #include <config_cmd_default.h>
@@ -57,11 +58,7 @@
 #define CONFIG_DOS_PARTITION
 
 #define CONFIG_CMD_CACHE
-#if 0
-#define CONFIG_CMD_DATE
-#endif
 #define CONFIG_CMD_DHCP
-#define CONFIG_CMD_FAT
 #define CONFIG_CMD_GPIO
 #define CONFIG_CMD_MII
 #define CONFIG_CMD_MMC
@@ -69,13 +66,6 @@
 #define CONFIG_CMD_NFS
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_SETEXPR
-#if 0
-#define CONFIG_CMD_SPI /* cmd_spi uses full-duplex, not supported by mx28 */
-#define CONFIG_CMD_SF
-#endif
-#if 0
-#define CONFIG_CMD_USB
-#endif
 #define CONFIG_CMD_BOOTZ
 #define CONFIG_CMD_ITEST
 #define CONFIG_CMD_UNZIP
@@ -171,40 +161,6 @@
 #define CONFIG_SERVERIP		192.168.9.133
 #define CONFIG_NETMASK		255.255.255.0
 #define CONFIG_GATEWAYIP	192.168.9.254
-
-/* RTC */
-#ifdef	CONFIG_CMD_DATE
-#define	CONFIG_RTC_MXS
-#endif
-
-/* USB */
-#ifdef	CONFIG_CMD_USB
-#define	CONFIG_USB_EHCI
-#define	CONFIG_USB_EHCI_MXS
-#define	CONFIG_EHCI_MXS_PORT 1
-#define	CONFIG_EHCI_IS_TDI
-#define	CONFIG_USB_STORAGE
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_ASIX
-#define CONFIG_USB_ETHER_SMSC95XX
-#endif
-
-/* I2C */
-#ifdef CONFIG_CMD_I2C
-#define CONFIG_I2C_MXS
-#define CONFIG_HARD_I2C
-#define CONFIG_MXS_I2C_BASE	MXS_I2C1_BASE
-#define CONFIG_SYS_I2C_SPEED	100000
-#endif
-
-/* SPI - cmd_spi uses full-duplex, not supported by mx28 */
-#ifdef CONFIG_CMD_SPI
-#define CONFIG_HARD_SPI
-#define CONFIG_MXS_SPI
-#define CONFIG_SPI_HALF_DUPLEX
-#define CONFIG_DEFAULT_SPI_BUS		2
-#define CONFIG_DEFAULT_SPI_MODE		SPI_MODE_0
-#endif
 
 /* BOOTP options */
 #define CONFIG_BOOTP_SUBNETMASK

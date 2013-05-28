@@ -1,5 +1,8 @@
 /*
- * Freescale MX28EVK board
+ * IEQualize GmbH Home-Box platform
+ * Copyright (C) 2012-2013 IEQualize GmbH <info@iequalize.de>
+ *
+ * Based on:
  *
  * (C) Copyright 2011 Freescale Semiconductor, Inc.
  *
@@ -37,16 +40,19 @@
 #include <errno.h>
 #include <mmc.h>
 
+DECLARE_GLOBAL_DATA_PTR;
+
+static u32 system_rev;
+
 #define SYSTEM_REV_OFFSET    0x8
 #define HW3REV0100 0x100
 #define HW3REV0200 0x200
 #define HW3REV0300 0x300
 
-DECLARE_GLOBAL_DATA_PTR;
-
 #define MUX_CONFIG_REV (MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_NOPULL)
 #define MUX_CONFIG_LED (MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_NOPULL)
 
+#define GPIO_PHY_RESET MX28_PAD_LCD_D00__GPIO_1_0
 
 /* LEDs on HW3 Rev 0100 */
 static const iomux_cfg_t leds_hw0100_pads[] = {
@@ -78,16 +84,13 @@ int board_early_init_f(void)
 {
 	/* IO0 clock at 480MHz */
 	mxs_set_ioclk(MXC_IOCLK0, 480000);
-	/* IO1 clock at 480MHz */
-	mxs_set_ioclk(MXC_IOCLK1, 480000);
-
 
 	/* SSP0 clock at 96MHz */
 	mxs_set_sspclk(MXC_SSPCLK0, 96000, 0);
-	/* SSP1 clock at 160MHz */
-	mxs_set_sspclk(MXC_SSPCLK2, 160000, 0);
+	/* SSP1 clock at 96MHz */
+	mxs_set_sspclk(MXC_SSPCLK2, 96000, 0);
 
-	/* the pads seem to have a long setup time, so do it early */
+	/* Setup pads for board revision detection */
 	mxs_iomux_setup_multiple_pads(
 		revision_pads, ARRAY_SIZE(revision_pads));
 
@@ -107,27 +110,39 @@ int board_init(void)
 	return 0;
 }
 
-static u32 system_rev;
-
 void board_rev_init(void)
 {
 	/*
-	 * REV0100: all pins high     -> 111 -> 000 -> 0x0100
-	 * REV0200: PINID_LCD_D06 low -> 101 -> 010 -> 0x0200
+	 * REV0100^: all pins floating               -> 111 -> 000 -> 0x0100
+	 * REV0200^: floating, pull-down, floating   -> 101 -> 010 -> 0x0200
+	 * REV0300:  pull-up, pull-down, pull-down   -> 100 -> 011 -> 0x0300
+	 * unusable: pull-down, pull-down, pull-down -> 000 -> 111 -> 0x0700
+	 *
+	 * ^ Sampling the pins might be unreliable due to missing pull-ups/pull-downs.
+	 *   In this case the board revision is typically detected as
+	 *   000 -> 111 -> 0x0700 so simply assume that it is REV0200 for real
+	 *   as newer board revisions should not suffer from floating pins anymore.
 	 */
 	system_rev =
 		((!gpio_get_value(MX28_PAD_LCD_D05__GPIO_1_5)) << 2) |
 		((!gpio_get_value(MX28_PAD_LCD_D06__GPIO_1_6)) << 1) |
-		(!gpio_get_value(MX28_PAD_LCD_D07__GPIO_1_7));
-
-	/* FIXME: gpio_get_value do not always detect correct revision */
-	system_rev = 2;
+		( !gpio_get_value(MX28_PAD_LCD_D07__GPIO_1_7));
 
 	if (system_rev == 0)
 		system_rev = 1;
+	if (system_rev == 7)
+		system_rev = 2;
 
 	system_rev <<= SYSTEM_REV_OFFSET;
+}
 
+u32 get_board_rev(void)
+{
+	return system_rev;
+}
+
+void board_leds_init(void)
+{
 	/* Disable LEDs after reset ... */
 	switch (system_rev) {
 	case HW3REV0100:
@@ -138,6 +153,7 @@ void board_rev_init(void)
 		gpio_direction_output(MX28_PAD_GPMI_ALE__GPIO_0_26, 0);
 		break;
 	case HW3REV0200:
+	case HW3REV0300:
 	default:
 		mxs_iomux_setup_multiple_pads(
 			leds_hw0200_pads, ARRAY_SIZE(leds_hw0200_pads));
@@ -156,16 +172,12 @@ void board_rev_init(void)
 		gpio_set_value(MX28_PAD_GPMI_ALE__GPIO_0_26, 1);
 		break;
 	case HW3REV0200:
+	case HW3REV0300:
 	default:
 		gpio_set_value(MX28_PAD_LCD_D18__GPIO_1_18, 1);
 		gpio_set_value(MX28_PAD_LCD_D19__GPIO_1_19, 1);
 		break;
-   }
-}
-
-u32 get_board_rev(void)
-{
-	return system_rev;
+	}
 }
 
 #ifdef	CONFIG_CMD_MMC
@@ -194,15 +206,15 @@ int board_eth_init(bd_t *bis)
 
 	ret = cpu_eth_init(bis);
 
-	/* MX28EVK uses ENET_CLK PAD to drive FEC clock */
-	writel(CLKCTRL_ENET_TIME_SEL_RMII_CLK | CLKCTRL_ENET_CLK_OUT_EN,
-					&clkctrl_regs->hw_clkctrl_enet);
+	/* select source for IEEE 1588 timer */
+	setbits_le32(&clkctrl_regs->hw_clkctrl_enet, CLKCTRL_ENET_TIME_SEL_RMII_CLK);
 
 	/* Reset PHY */
-	gpio_direction_output(MX28_PAD_LCD_D00__GPIO_1_0, 0);
-	udelay(10000);
-	gpio_set_value(MX28_PAD_LCD_D00__GPIO_1_0, 1);
-	udelay(10000);
+	gpio_direction_output(GPIO_PHY_RESET, 1);
+	udelay(50);
+	gpio_set_value(GPIO_PHY_RESET, 0);
+	udelay(200);
+	gpio_set_value(GPIO_PHY_RESET, 1);
 
 	ret = fecmxc_initialize(bis);
 	if (ret) {
@@ -223,20 +235,23 @@ int board_eth_init(bd_t *bis)
 
 int misc_init_r(void)
 {
-	puts("Board: Home-Box\n");
 	char *s = getenv("serial");
+
+	puts("Board: Home-Box\n");
 
 	if (s && s[0]) {
 		puts("Serial: ");
 		puts(s);
 		putc('\n');
 	}
+
 	return 0;
 }
 
 int board_late_init(void)
 {
 	board_rev_init();
+	board_leds_init();
 
 	printf("Revision: %04x\n", system_rev);
 
