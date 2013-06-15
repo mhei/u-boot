@@ -78,6 +78,7 @@ BIN_FILES-$(CONFIG_KIRKWOOD) += kwboot$(SFX)
 # Source files which exist outside the tools directory
 EXT_OBJ_FILES-$(CONFIG_BUILD_ENVCRC) += common/env_embedded.o
 EXT_OBJ_FILES-y += common/image.o
+EXT_OBJ_FILES-$(CONFIG_FIT) += common/image-fit.o
 EXT_OBJ_FILES-y += lib/crc32.o
 EXT_OBJ_FILES-y += lib/md5.o
 EXT_OBJ_FILES-y += lib/sha1.o
@@ -95,6 +96,7 @@ NOPED_OBJ_FILES-y += aisimage.o
 NOPED_OBJ_FILES-y += kwbimage.o
 NOPED_OBJ_FILES-y += pblimage.o
 NOPED_OBJ_FILES-y += imximage.o
+NOPED_OBJ_FILES-y += image-host.o
 NOPED_OBJ_FILES-y += omapimage.o
 NOPED_OBJ_FILES-y += mkenvimage.o
 NOPED_OBJ_FILES-y += mkimage.o
@@ -128,27 +130,20 @@ LOGO-$(CONFIG_LCD_LOGO) += $(LOGO_DATA_H)
 LOGO-$(CONFIG_VIDEO_LOGO) += $(LOGO_H)
 LOGO-$(CONFIG_VIDEO_LOGO) += $(LOGO_DATA_H)
 
+# Generic logo
 ifeq ($(LOGO_BMP),)
 LOGO_BMP= logos/denx.bmp
+
+# Use board logo and fallback to vendor
+ifneq ($(wildcard logos/$(BOARD).bmp),)
+LOGO_BMP= logos/$(BOARD).bmp
+else
+ifneq ($(wildcard logos/$(VENDOR).bmp),)
+LOGO_BMP= logos/$(VENDOR).bmp
 endif
-ifeq ($(VENDOR),atmel)
-LOGO_BMP= logos/atmel.bmp
 endif
-ifeq ($(VENDOR),esd)
-LOGO_BMP= logos/esd.bmp
-endif
-ifeq ($(VENDOR),freescale)
-LOGO_BMP= logos/freescale.bmp
-endif
-ifeq ($(VENDOR),ronetix)
-LOGO_BMP= logos/ronetix.bmp
-endif
-ifeq ($(VENDOR),syteco)
-LOGO_BMP= logos/syteco.bmp
-endif
-ifeq ($(VENDOR),intercontrol)
-LOGO_BMP= logos/intercontrol.bmp
-endif
+
+endif # !LOGO_BMP
 
 # now $(obj) is defined
 HOSTSRCS += $(addprefix $(SRCTREE)/,$(EXT_OBJ_FILES-y:.o=.c))
@@ -209,7 +204,9 @@ $(obj)mkimage$(SFX):	$(obj)aisimage.o \
 			$(obj)crc32.o \
 			$(obj)default_image.o \
 			$(obj)fit_image.o \
+			$(obj)image-fit.o \
 			$(obj)image.o \
+			$(obj)image-host.o \
 			$(obj)imximage.o \
 			$(obj)kwbimage.o \
 			$(obj)pblimage.o \

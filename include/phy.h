@@ -52,6 +52,7 @@ typedef enum {
 	PHY_INTERFACE_MODE_MII,
 	PHY_INTERFACE_MODE_GMII,
 	PHY_INTERFACE_MODE_SGMII,
+	PHY_INTERFACE_MODE_QSGMII,
 	PHY_INTERFACE_MODE_TBI,
 	PHY_INTERFACE_MODE_RMII,
 	PHY_INTERFACE_MODE_RGMII,
@@ -67,6 +68,7 @@ static const char *phy_interface_strings[] = {
 	[PHY_INTERFACE_MODE_MII]		= "mii",
 	[PHY_INTERFACE_MODE_GMII]		= "gmii",
 	[PHY_INTERFACE_MODE_SGMII]		= "sgmii",
+	[PHY_INTERFACE_MODE_QSGMII]		= "qsgmii",
 	[PHY_INTERFACE_MODE_TBI]		= "tbi",
 	[PHY_INTERFACE_MODE_RMII]		= "rmii",
 	[PHY_INTERFACE_MODE_RGMII]		= "rgmii",
@@ -223,6 +225,7 @@ int gen10g_discover_mmds(struct phy_device *phydev);
 int phy_atheros_init(void);
 int phy_broadcom_init(void);
 int phy_davicom_init(void);
+int phy_et1011c_init(void);
 int phy_lxt_init(void);
 int phy_marvell_init(void);
 int phy_micrel_init(void);

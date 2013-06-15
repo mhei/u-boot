@@ -66,6 +66,7 @@ static const char * const compat_names[COMPAT_COUNT] = {
 	COMPAT(GENERIC_SPI_FLASH, "spi-flash"),
 	COMPAT(MAXIM_98095_CODEC, "maxim,max98095-codec"),
 	COMPAT(INFINEON_SLB9635_TPM, "infineon,slb9635-tpm"),
+	COMPAT(INFINEON_SLB9645_TPM, "infineon,slb9645-tpm"),
 };
 
 const char *fdtdec_get_compatible(enum fdt_compat_id id)
@@ -354,10 +355,11 @@ int fdtdec_check_fdt(void)
  */
 int fdtdec_prepare_fdt(void)
 {
-	if (((uintptr_t)gd->fdt_blob & 3) || fdt_check_header(gd->fdt_blob)) {
+	if (!gd->fdt_blob || ((uintptr_t)gd->fdt_blob & 3) ||
+	    fdt_check_header(gd->fdt_blob)) {
 		printf("No valid FDT found - please append one to U-Boot "
 			"binary, use u-boot-dtb.bin or define "
-			"CONFIG_OF_EMBED\n");
+			"CONFIG_OF_EMBED. For sandbox, use -d <file.dtb>\n");
 		return -1;
 	}
 	return 0;

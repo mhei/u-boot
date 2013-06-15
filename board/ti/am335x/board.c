@@ -297,6 +297,15 @@ static struct emif_regs ddr3_evm_emif_reg_data = {
 	.emif_ddr_phy_ctlr_1 = MT41J512M8RH125_EMIF_READ_LATENCY |
 				PHY_EN_DYN_PWRDN,
 };
+
+#ifdef CONFIG_SPL_OS_BOOT
+int spl_start_uboot(void)
+{
+	/* break into full u-boot on 'c' */
+	return (serial_tstc() && serial_getc() == 'c');
+}
+#endif
+
 #endif
 
 /*
@@ -304,6 +313,15 @@ static struct emif_regs ddr3_evm_emif_reg_data = {
  */
 void s_init(void)
 {
+	/*
+	 * Save the boot parameters passed from romcode.
+	 * We cannot delay the saving further than this,
+	 * to prevent overwrites.
+	 */
+#ifdef CONFIG_SPL_BUILD
+	save_omap_boot_params();
+#endif
+
 	/* WDT1 is already running when the bootloader gets control
 	 * Disable it to avoid "random" resets
 	 */
@@ -496,6 +514,7 @@ int board_eth_init(bd_t *bis)
 			eth_setenv_enetaddr("ethaddr", mac_addr);
 	}
 
+#ifdef CONFIG_DRIVER_TI_CPSW
 	if (board_is_bone() || board_is_bone_lt() || board_is_idk()) {
 		writel(MII_MODE_ENABLE, &cdev->miisel);
 		cpsw_slaves[0].phy_if = cpsw_slaves[1].phy_if =
@@ -511,6 +530,7 @@ int board_eth_init(bd_t *bis)
 		printf("Error %d registering CPSW switch\n", rv);
 	else
 		n += rv;
+#endif
 
 	/*
 	 *

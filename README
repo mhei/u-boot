@@ -201,7 +201,6 @@ Directory Hierarchy:
       /mpc5xx		Files specific to Freescale MPC5xx CPUs
       /mpc5xxx		Files specific to Freescale MPC5xxx CPUs
       /mpc8xx		Files specific to Freescale MPC8xx CPUs
-      /mpc8220		Files specific to Freescale MPC8220 CPUs
       /mpc824x		Files specific to Freescale MPC824x CPUs
       /mpc8260		Files specific to Freescale MPC8260 CPUs
       /mpc85xx		Files specific to Freescale MPC85xx CPUs
@@ -845,6 +844,7 @@ The following options need to be configured:
 		CONFIG_CMD_FDOS		* Dos diskette Support
 		CONFIG_CMD_FLASH	  flinfo, erase, protect
 		CONFIG_CMD_FPGA		  FPGA device initialization support
+		CONFIG_CMD_FUSE		  Device fuse support
 		CONFIG_CMD_GETTIME	* Get time since boot
 		CONFIG_CMD_GO		* the 'go' command (exec code)
 		CONFIG_CMD_GREPENV	* search environment
@@ -899,6 +899,7 @@ The following options need to be configured:
 		CONFIG_CMD_SF		* Read/write/erase SPI NOR flash
 		CONFIG_CMD_SHA1SUM	  print sha1 memory digest
 					  (requires CONFIG_CMD_MEMORY)
+		CONFIG_CMD_SOFTSWITCH	* Soft switch setting command for BF60x
 		CONFIG_CMD_SOURCE	  "source" command Support
 		CONFIG_CMD_SPI		* SPI serial bus support
 		CONFIG_CMD_TFTPSRV	* TFTP transfer in server mode
@@ -930,6 +931,13 @@ The following options need to be configured:
 
 
 		XXX - this list needs to get updated!
+
+- Regular expression support:
+		CONFIG_REGEX
+                If this variable is defined, U-Boot is linked against
+                the SLRE (Super Light Regular Expression) library,
+                which adds regex support to some commands, as for
+                example "env grep" and "setexpr".
 
 - Device tree:
 		CONFIG_OF_CONTROL
@@ -1202,7 +1210,23 @@ The following options need to be configured:
 			If this option is set, the driver enables cache flush.
 
 - TPM Support:
-		CONFIG_GENERIC_LPC_TPM
+		CONFIG_TPM
+		Support TPM devices.
+
+		CONFIG_TPM_TIS_I2C
+		Support for i2c bus TPM devices. Only one device
+		per system is supported at this time.
+
+			CONFIG_TPM_TIS_I2C_BUS_NUMBER
+			Define the the i2c bus number for the TPM device
+
+			CONFIG_TPM_TIS_I2C_SLAVE_ADDRESS
+			Define the TPM's address on the i2c bus
+
+			CONFIG_TPM_TIS_I2C_BURST_LIMITATION
+			Define the burst count bytes upper limit
+
+		CONFIG_TPM_TIS_LPC
 		Support for generic parallel port TPM devices. Only one device
 		per system is supported at this time.
 
@@ -1237,6 +1261,9 @@ The following options need to be configured:
 
 		CONFIG_USB_EHCI_TXFIFO_THRESH enables setting of the
 		txfilltuning field in the EHCI controller on reset.
+
+		CONFIG_USB_HUB_MIN_POWER_ON_DELAY defines the minimum
+		interval for usb hub power-on delay.(minimum 100msec)
 
 - USB Device:
 		Define the below if you wish to use the USB console.
@@ -2917,11 +2944,29 @@ FIT uImage format:
 		Address, size and partition on the MMC to load U-Boot from
 		when the MMC is being used in raw mode.
 
+		CONFIG_SYS_MMCSD_RAW_MODE_KERNEL_SECTOR
+		Sector to load kernel uImage from when MMC is being
+		used in raw mode (for Falcon mode)
+
+		CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR,
+		CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS
+		Sector and number of sectors to load kernel argument
+		parameters from when MMC is being used in raw mode
+		(for falcon mode)
+
 		CONFIG_SPL_FAT_SUPPORT
 		Support for fs/fat/libfat.o in SPL binary
 
 		CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME
 		Filename to read to load U-Boot when reading from FAT
+
+		CONFIG_SPL_FAT_LOAD_KERNEL_NAME
+		Filename to read to load kernel uImage when reading
+		from FAT (for Falcon mode)
+
+		CONFIG_SPL_FAT_LOAD_ARGS_NAME
+		Filename to read to load kernel argument parameters
+		when reading from FAT (for Falcon mode)
 
 		CONFIG_SPL_MPC83XX_WAIT_FOR_NAND
 		Set this for NAND SPL on PPC mpc83xx targets, so that
@@ -2997,6 +3042,12 @@ FIT uImage format:
 		Final target image containing SPL and payload.  Some SPLs
 		use an arch-specific makefile fragment instead, for
 		example if more than one image needs to be produced.
+
+		CONFIG_FIT_SPL_PRINT
+		Printing information about a FIT image adds quite a bit of
+		code to SPL. So this is normally disabled in SPL. Use this
+		option to re-enable it. This will affect the output of the
+		bootm command when booting a FIT image.
 
 Modem Support:
 --------------
@@ -3257,6 +3308,15 @@ Configuration Settings:
 		digits and dots.  Recommended value: 45 (9..1) for 80
 		column displays, 15 (3..1) for 40 column displays.
 
+- CONFIG_FLASH_VERIFY
+		If defined, the content of the flash (destination) is compared
+		against the source after the write operation. An error message
+		will be printed when the contents are not identical.
+		Please note that this option is useless in nearly all cases,
+		since such flash programming errors usually are detected earlier
+		while unprotecting/erasing/programming. Please only enable
+		this option if you really know what you are doing.
+
 - CONFIG_SYS_RX_ETH_BUFFER:
 		Defines the number of Ethernet receive buffers. On some
 		Ethernet controllers it is recommended to set this value
@@ -3332,6 +3392,10 @@ Configuration Settings:
 	offset _bss_start_ofs from CONFIG_SYS_TEXT_BASE, rather than
 	directly. You should not need to touch this setting.
 
+- CONFIG_OMAP_PLATFORM_RESET_TIME_MAX_USEC (OMAP only)
+	This is set by OMAP boards for the max time that reset should
+	be asserted. See doc/README.omap-reset-time for details on how
+	the value can be calulated on a given board.
 
 The following definitions that deal with the placement and management
 of environment data (variable area); in general, we support the
@@ -3845,6 +3909,9 @@ Low Level (hardware related) configuration options:
 		something has already done it, and we don't need to do it
 		a second time.	Useful for platforms that are pre-booted
 		by coreboot or similar.
+
+- CONFIG_PCI_INDIRECT_BRIDGE:
+		Enable support for indirect PCI bridges.
 
 - CONFIG_SYS_SRIO:
 		Chip has SRIO or not
@@ -5050,7 +5117,7 @@ On some platforms, it's possible to boot Linux zImage. This is done
 using the "bootz" command. The syntax of "bootz" command is the same
 as the syntax of "bootm" command.
 
-Note, defining the CONFIG_SUPPORT_INITRD_RAW allows user to supply
+Note, defining the CONFIG_SUPPORT_RAW_INITRD allows user to supply
 kernel with raw initrd images. The syntax is slightly different, the
 address of the initrd must be augmented by it's size, in the following
 format: "<initrd addres>:<initrd size>".
