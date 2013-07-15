@@ -209,7 +209,13 @@ int board_eth_init(bd_t *bis)
 	/* select source for IEEE 1588 timer */
 	setbits_le32(&clkctrl_regs->hw_clkctrl_enet, CLKCTRL_ENET_TIME_SEL_RMII_CLK);
 
-	/* Reset PHY */
+	/*
+	 * Reset PHY
+	 * We first drive the pin HIGH before we switch to output. This should
+	 * prevent a tiny glitch which could cause a short drop of the clock output
+	 * of the PHY (PHY is running in REFCLKO mode).
+	 */
+	gpio_set_value(GPIO_PHY_RESET, 1);
 	gpio_direction_output(GPIO_PHY_RESET, 1);
 	udelay(50);
 	gpio_set_value(GPIO_PHY_RESET, 0);
