@@ -2,6 +2,8 @@
 # Tool mainly for U-Boot Quality Assurance: build one or more board
 # configurations with minimal verbosity, showing only warnings and
 # errors.
+#
+# SPDX-License-Identifier:	GPL-2.0+
 
 usage()
 {
@@ -435,16 +437,11 @@ LIST_mips="		\
 ## MIPS Systems		(little endian)
 #########################################################################
 
-LIST_xburst_el="	\
-	qi_lb60		\
-"
-
 LIST_au1xx0_el="	\
 	dbau1550_el	\
 	pb1000		\
 "
 LIST_mips_el="			\
-	${LIST_xburst_el}	\
 	${LIST_au1xx0_el}	\
 "
 #########################################################################

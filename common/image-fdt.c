@@ -6,23 +6,7 @@
  * (C) Copyright 2000-2006
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -243,18 +227,21 @@ int boot_get_fdt(int flag, int argc, char * const argv[], uint8_t arch,
 	ulong		load, load_end;
 	void		*buf;
 #if defined(CONFIG_FIT)
-	const char	*fit_uname_config = NULL;
+	const char	*fit_uname_config = images->fit_uname_cfg;
 	const char	*fit_uname_fdt = NULL;
 	ulong		default_addr;
 	int		fdt_noffset;
 #endif
+	const char *select = NULL;
 
 	*of_flat_tree = NULL;
 	*of_size = 0;
 
-	if (argc > 3 || genimg_has_config(images)) {
+	if (argc > 2)
+		select = argv[2];
+	if (select || genimg_has_config(images)) {
 #if defined(CONFIG_FIT)
-		if (argc > 3) {
+		if (select) {
 			/*
 			 * If the FDT blob comes from the FIT image and the
 			 * FIT image address is omitted in the command line
@@ -268,18 +255,18 @@ int boot_get_fdt(int flag, int argc, char * const argv[], uint8_t arch,
 			else
 				default_addr = load_addr;
 
-			if (fit_parse_conf(argv[3], default_addr,
+			if (fit_parse_conf(select, default_addr,
 					   &fdt_addr, &fit_uname_config)) {
 				debug("*  fdt: config '%s' from image at 0x%08lx\n",
 				      fit_uname_config, fdt_addr);
-			} else if (fit_parse_subimage(argv[3], default_addr,
+			} else if (fit_parse_subimage(select, default_addr,
 				   &fdt_addr, &fit_uname_fdt)) {
 				debug("*  fdt: subimage '%s' from image at 0x%08lx\n",
 				      fit_uname_fdt, fdt_addr);
 			} else
 #endif
 			{
-				fdt_addr = simple_strtoul(argv[3], NULL, 16);
+				fdt_addr = simple_strtoul(select, NULL, 16);
 				debug("*  fdt: cmdline image address = 0x%08lx\n",
 				      fdt_addr);
 			}
@@ -364,7 +351,7 @@ int boot_get_fdt(int flag, int argc, char * const argv[], uint8_t arch,
 				fdt_noffset = fit_image_load(images,
 					FIT_FDT_PROP,
 					fdt_addr, &fit_uname_fdt,
-					fit_uname_config,
+					&fit_uname_config,
 					arch, IH_TYPE_FLATDT,
 					BOOTSTAGE_ID_FIT_FDT_START,
 					FIT_LOAD_OPTIONAL, &load, &len);

@@ -3,10 +3,7 @@
  *
  * Author: Fabio Estevam <fabio.estevam@freescale.com>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <asm/arch/clock.h>
@@ -48,7 +45,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 int dram_init(void)
 {
-	gd->ram_size = CONFIG_DDR_MB * SZ_1M;
+	gd->ram_size = (phys_size_t)CONFIG_DDR_MB * 1024 * 1024;
 
 	return 0;
 }

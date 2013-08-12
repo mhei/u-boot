@@ -1,30 +1,14 @@
 #
-# (C) Copyright 2000-2012
+# (C) Copyright 2000-2013
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 #
-# See file CREDITS for list of people who contributed to this
-# project.
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundatio; either version 2 of
-# the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-# MA 02111-1307 USA
+# SPDX-License-Identifier:	GPL-2.0+
 #
 
 VERSION = 2013
 PATCHLEVEL = 07
 SUBLEVEL =
-EXTRAVERSION = -rc1
+EXTRAVERSION =
 ifneq "$(SUBLEVEL)" ""
 U_BOOT_VERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
 else
@@ -247,6 +231,7 @@ OBJS := $(addprefix $(obj),$(OBJS))
 HAVE_VENDOR_COMMON_LIB = $(if $(wildcard board/$(VENDOR)/common/Makefile),y,n)
 
 LIBS-y += lib/libgeneric.o
+LIBS-y += lib/rsa/librsa.o
 LIBS-y += lib/lzma/liblzma.o
 LIBS-y += lib/lzo/liblzo.o
 LIBS-y += lib/xz/libxz.o
@@ -429,7 +414,7 @@ endif
 
 all:		$(ALL-y) $(SUBDIR_EXAMPLES)
 
-$(obj)u-boot.dtb:	$(obj)u-boot
+$(obj)u-boot.dtb:	checkdtc $(obj)u-boot
 		$(MAKE) -C dts binary
 		mv $(obj)dts/dt.dtb $@
 
@@ -683,6 +668,12 @@ checkgcc4:
 		false; \
 	fi
 
+checkdtc:
+	@if test $(call dtc-version) -lt 0104; then \
+		echo '*** Your dtc is too old, please upgrade to dtc 1.4 or newer'; \
+		false; \
+	fi
+
 #
 # Auto-generate the autoconf.mk file (which is included by all makefiles)
 #
@@ -743,6 +734,13 @@ updater depend dep tags ctags etags cscope $(obj)System.map:
 tools: $(VERSION_FILE) $(TIMESTAMP_FILE)
 	$(MAKE) -C $@ all
 endif	# config.mk
+
+# ARM relocations should all be R_ARM_RELATIVE.
+checkarmreloc: $(obj)u-boot
+	@if test "R_ARM_RELATIVE" != \
+		"`$(CROSS_COMPILE)readelf -r $< | cut -d ' ' -f 4 | grep R_ARM | sort -u`"; \
+		then echo "$< contains relocations other than \
+		R_ARM_RELATIVE"; false; fi
 
 $(VERSION_FILE):
 		@mkdir -p $(dir $(VERSION_FILE))
@@ -825,7 +823,8 @@ clean:
 	       $(obj)tools/mk{smdk5250,}spl				  \
 	       $(obj)tools/mxsboot					  \
 	       $(obj)tools/ncb		   $(obj)tools/ubsha1		  \
-	       $(obj)tools/kernel-doc/docproc
+	       $(obj)tools/kernel-doc/docproc				  \
+	       $(obj)tools/proftool
 	@rm -f $(obj)board/cray/L1/{bootscript.c,bootscript.image}	  \
 	       $(obj)board/matrix_vision/*/bootscript.img		  \
 	       $(obj)board/voiceblue/eeprom 				  \

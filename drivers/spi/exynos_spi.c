@@ -2,19 +2,7 @@
  * (C) Copyright 2012 SAMSUNG Electronics
  * Padmavathi Venna <padma.v@samsung.com>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -464,6 +452,28 @@ static int process_nodes(const void *blob, int node_list[], int count)
 	return 0;
 }
 #endif
+
+/**
+ * Set up a new SPI slave for an fdt node
+ *
+ * @param blob		Device tree blob
+ * @param node		SPI peripheral node to use
+ * @return 0 if ok, -1 on error
+ */
+struct spi_slave *spi_setup_slave_fdt(const void *blob, int node,
+		unsigned int cs, unsigned int max_hz, unsigned int mode)
+{
+	struct spi_bus *bus;
+	unsigned int i;
+
+	for (i = 0, bus = spi_bus; i < bus_count; i++, bus++) {
+		if (bus->node == node)
+			return spi_setup_slave(i, cs, max_hz, mode);
+	}
+
+	debug("%s: Failed to find bus node %d\n", __func__, node);
+	return NULL;
+}
 
 /* Sadly there is no error return from this function */
 void spi_init(void)

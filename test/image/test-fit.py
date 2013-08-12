@@ -4,20 +4,7 @@
 #
 # Sanity check of the FIT handling in U-Boot
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 2 of
-# the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-# MA 02111-1307 USA
+# SPDX-License-Identifier:	GPL-2.0+
 #
 # To run this:
 #
@@ -272,12 +259,13 @@ def set_test(name):
     test_name = name
     print name
 
-def fail(msg):
+def fail(msg, stdout):
     """Raise an error with a helpful failure message
 
     Args:
         msg: Message to display
     """
+    print stdout
     raise ValueError("Test '%s' failed: %s" % (test_name, msg))
 
 def run_fit_test(mkimage, u_boot):
@@ -341,11 +329,11 @@ def run_fit_test(mkimage, u_boot):
     set_test('Kernel load')
     stdout = command.Output(u_boot, '-d', control_dtb, '-c', cmd)
     if read_file(kernel) != read_file(kernel_out):
-        fail('Kernel not loaded')
+        fail('Kernel not loaded', stdout)
     if read_file(control_dtb) == read_file(fdt_out):
-        fail('FDT loaded but should be ignored')
+        fail('FDT loaded but should be ignored', stdout)
     if read_file(ramdisk) == read_file(ramdisk_out):
-        fail('Ramdisk loaded but should not be')
+        fail('Ramdisk loaded but should not be', stdout)
 
     # Find out the offset in the FIT where U-Boot has found the FDT
     line = find_matching(stdout, 'Booting using the fdt blob at ')
@@ -357,7 +345,7 @@ def run_fit_test(mkimage, u_boot):
     real_fit_offset = data.find(fdt_magic, 4)
     if fit_offset != real_fit_offset:
         fail('U-Boot loaded FDT from offset %#x, FDT is actually at %#x' %
-                (fit_offset, real_fit_offset))
+                (fit_offset, real_fit_offset), stdout)
 
     # Now a kernel and an FDT
     set_test('Kernel + FDT load')
@@ -365,11 +353,11 @@ def run_fit_test(mkimage, u_boot):
     fit = make_fit(mkimage, params)
     stdout = command.Output(u_boot, '-d', control_dtb, '-c', cmd)
     if read_file(kernel) != read_file(kernel_out):
-        fail('Kernel not loaded')
+        fail('Kernel not loaded', stdout)
     if read_file(control_dtb) != read_file(fdt_out):
-        fail('FDT not loaded')
+        fail('FDT not loaded', stdout)
     if read_file(ramdisk) == read_file(ramdisk_out):
-        fail('Ramdisk loaded but should not be')
+        fail('Ramdisk loaded but should not be', stdout)
 
     # Try a ramdisk
     set_test('Kernel + FDT + Ramdisk load')
@@ -378,7 +366,7 @@ def run_fit_test(mkimage, u_boot):
     fit = make_fit(mkimage, params)
     stdout = command.Output(u_boot, '-d', control_dtb, '-c', cmd)
     if read_file(ramdisk) != read_file(ramdisk_out):
-        fail('Ramdisk not loaded')
+        fail('Ramdisk not loaded', stdout)
 
 def run_tests():
     """Parse options, run the FIT tests and print the result"""

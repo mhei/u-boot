@@ -7,23 +7,7 @@
  * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
  * Marius Groeger <mgroeger@sysgo.de>
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -58,6 +42,7 @@
 #include <serial.h>
 #include <spi.h>
 #include <stdio_dev.h>
+#include <trace.h>
 #include <watchdog.h>
 #ifdef CONFIG_ADDR_MAP
 #include <asm/mmu.h>
@@ -102,6 +87,15 @@ static int initr_secondary_cpu(void)
 	 */
 	/* TODO: maybe define this for all archs? */
 	cpu_secondary_init_r();
+
+	return 0;
+}
+
+static int initr_trace(void)
+{
+#ifdef CONFIG_TRACE
+	trace_init(gd->trace_buff, CONFIG_TRACE_BUFFER_SIZE);
+#endif
 
 	return 0;
 }
@@ -711,6 +705,7 @@ static int run_main_loop(void)
  * TODO: perhaps reset the watchdog in the initcall function after each call?
  */
 init_fnc_t init_sequence_r[] = {
+	initr_trace,
 	initr_reloc,
 	/* TODO: could x86/PPC have this also perhaps? */
 #ifdef CONFIG_ARM

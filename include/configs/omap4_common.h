@@ -6,23 +6,7 @@
  *
  * TI OMAP4 common configuration settings
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_OMAP4_COMMON_H
@@ -150,6 +134,7 @@
 	"console=ttyO2,115200n8\0" \
 	"fdt_high=0xffffffff\0" \
 	"fdtaddr=0x80f80000\0" \
+	"fdtfile=undefined\0" \
 	"bootpart=0:2\0" \
 	"bootdir=/boot\0" \
 	"bootfile=zImage\0" \
@@ -177,8 +162,12 @@
 			"setenv fdtfile omap4-sdp.dtb; fi; " \
 		"if test $board_name = panda; then " \
 			"setenv fdtfile omap4-panda.dtb; fi;" \
+		"if test $board_name = panda-a4; then " \
+			"setenv fdtfile omap4-panda-a4.dtb; fi;" \
 		"if test $board_name = panda-es; then " \
-			"setenv fdtfile omap4-panda-es.dtb; fi; \0" \
+			"setenv fdtfile omap4-panda-es.dtb; fi;" \
+		"if test $fdtfile = undefined; then " \
+			"echo WARNING: Could not determine device tree to use; fi; \0" \
 	"loadfdt=load mmc ${bootpart} ${fdtaddr} ${bootdir}/${fdtfile}\0" \
 
 #define CONFIG_BOOTCOMMAND \

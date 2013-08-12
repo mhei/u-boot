@@ -6,23 +6,7 @@
  * Copyright(c) 2002,2003 Motorola Inc.
  * Xianghua Xiao (x.xiao@motorola.com)
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __IMMAP_85xx__
@@ -1839,11 +1823,13 @@ typedef struct ccsr_gur {
 #define FSL_CORENET2_RCWSR4_SRDS3_PRTCL_SHIFT	11
 #define FSL_CORENET2_RCWSR4_SRDS4_PRTCL		0x000000f8
 #define FSL_CORENET2_RCWSR4_SRDS4_PRTCL_SHIFT	3
+#define FSL_CORENET_RCWSR6_BOOT_LOC	0x0f800000
 #elif defined(CONFIG_PPC_B4860) || defined(CONFIG_PPC_B4420)
 #define FSL_CORENET2_RCWSR4_SRDS1_PRTCL	0xfe000000
 #define FSL_CORENET2_RCWSR4_SRDS1_PRTCL_SHIFT	25
 #define FSL_CORENET2_RCWSR4_SRDS2_PRTCL	0x00ff0000
 #define FSL_CORENET2_RCWSR4_SRDS2_PRTCL_SHIFT	16
+#define FSL_CORENET_RCWSR6_BOOT_LOC	0x0f800000
 #elif defined(CONFIG_PPC_T1040)
 #define FSL_CORENET2_RCWSR4_SRDS1_PRTCL	0xff000000
 #define FSL_CORENET2_RCWSR4_SRDS1_PRTCL_SHIFT	24
@@ -2160,7 +2146,7 @@ typedef struct ccsr_gur {
 	u32	porbmsr;	/* POR boot mode status */
 #define MPC85xx_PORBMSR_HA		0x00070000
 #define MPC85xx_PORBMSR_HA_SHIFT	16
-#define MPC85XX_PORBMSR_ROMLOC_SHIFT	24
+#define MPC85xx_PORBMSR_ROMLOC_SHIFT	24
 #define PORBMSR_ROMLOC_SPI	0x6
 #define PORBMSR_ROMLOC_SDHC	0x7
 #define PORBMSR_ROMLOC_NAND_2K	0x9

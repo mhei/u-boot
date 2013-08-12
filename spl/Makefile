@@ -9,8 +9,7 @@
 # Texas Instruments Incorporated - http://www.ti.com/
 # Aneesh V <aneesh@ti.com>
 #
-# This file is released under the terms of GPL v2 and any later version.
-# See the file COPYING in the root directory of the source tree for details.
+# SPDX-License-Identifier:	GPL-2.0+
 #
 # Based on top-level Makefile.
 #
@@ -96,6 +95,14 @@ ifneq ($(CONFIG_TEGRA),)
 LIBS-y += arch/$(ARCH)/cpu/$(SOC)-common/lib$(SOC)-common.o
 LIBS-y += arch/$(ARCH)/cpu/tegra-common/libcputegra-common.o
 LIBS-y += $(CPUDIR)/tegra-common/libtegra-common.o
+endif
+
+ifneq ($(CONFIG_MX23)$(CONFIG_MX35),)
+LIBS-y += arch/$(ARCH)/imx-common/libimx-common.o
+endif
+
+ifeq ($(SOC),exynos)
+LIBS-y += $(CPUDIR)/s5p-common/libs5p-common.o
 endif
 
 # Add GCC lib

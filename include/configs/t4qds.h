@@ -1,23 +1,7 @@
 /*
  * Copyright 2011-2012 Freescale Semiconductor, Inc.
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -31,6 +15,15 @@
 #define CONFIG_RESET_VECTOR_ADDRESS	0xfffffffc
 #define CONFIG_PBLPBI_CONFIG $(SRCTREE)/board/freescale/t4qds/t4_pbi.cfg
 #define CONFIG_PBLRCW_CONFIG $(SRCTREE)/board/freescale/t4qds/t4_rcw.cfg
+#endif
+
+#ifdef CONFIG_SRIO_PCIE_BOOT_SLAVE
+/* Set 1M boot space */
+#define CONFIG_SYS_SRIO_PCIE_BOOT_SLAVE_ADDR (CONFIG_SYS_TEXT_BASE & 0xfff00000)
+#define CONFIG_SYS_SRIO_PCIE_BOOT_SLAVE_ADDR_PHYS \
+		(0x300000000ull | CONFIG_SYS_SRIO_PCIE_BOOT_SLAVE_ADDR)
+#define CONFIG_RESET_VECTOR_ADDRESS 0xfffffffc
+#define CONFIG_SYS_NO_FLASH
 #endif
 
 #define CONFIG_CMD_REGINFO
@@ -65,20 +58,22 @@
 #define CONFIG_SYS_SRIO
 #define CONFIG_SRIO1			/* SRIO port 1 */
 #define CONFIG_SRIO2			/* SRIO port 2 */
+#define CONFIG_SRIO_PCIE_BOOT_MASTER
 
 #define CONFIG_FSL_LAW			/* Use common FSL init code */
 
 #define CONFIG_ENV_OVERWRITE
 
 #ifdef CONFIG_SYS_NO_FLASH
+#if !defined(CONFIG_SRIO_PCIE_BOOT_SLAVE) && !defined(CONFIG_RAMBOOT_PBL)
 #define CONFIG_ENV_IS_NOWHERE
+#endif
 #else
 #define CONFIG_FLASH_CFI_DRIVER
 #define CONFIG_SYS_FLASH_CFI
 #define CONFIG_SYS_FLASH_USE_BUFFER_WRITE
 #endif
 
-#ifndef CONFIG_SYS_NO_FLASH
 #if defined(CONFIG_SPIFLASH)
 #define CONFIG_SYS_EXTRA_ENV_RELOC
 #define CONFIG_ENV_IS_IN_SPI_FLASH
@@ -100,18 +95,18 @@
 #define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_SIZE			CONFIG_SYS_NAND_BLOCK_SIZE
 #define CONFIG_ENV_OFFSET		(5 * CONFIG_SYS_NAND_BLOCK_SIZE)
+#elif defined(CONFIG_SRIO_PCIE_BOOT_SLAVE)
+#define CONFIG_ENV_IS_IN_REMOTE
+#define CONFIG_ENV_ADDR		0xffe20000
+#define CONFIG_ENV_SIZE		0x2000
+#elif defined(CONFIG_ENV_IS_NOWHERE)
+#define CONFIG_ENV_SIZE		0x2000
 #else
 #define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SECT_SIZE)
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_ENV_SECT_SIZE	0x20000 /* 128K (one sector) */
 #endif
-#else /* CONFIG_SYS_NO_FLASH */
-#define CONFIG_ENV_SIZE                0x2000
-#define CONFIG_ENV_SECT_SIZE   0x20000 /* 128K (one sector) */
-#endif
-
-
 
 #define CONFIG_SYS_CLK_FREQ	get_board_sys_clk()
 #define CONFIG_DDR_CLK_FREQ	get_board_ddr_clk()
@@ -434,14 +429,15 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_FIT_VERBOSE	/* enable fit_format_{error,warning}() */
 
 /* I2C */
-#define CONFIG_FSL_I2C		/* Use FSL common I2C driver */
-#define CONFIG_HARD_I2C		/* I2C with hardware support */
-#define CONFIG_I2C_MULTI_BUS
-#define CONFIG_I2C_CMD_TREE
-#define CONFIG_SYS_I2C_SPEED		100000	/* I2C speed */
-#define CONFIG_SYS_I2C_SLAVE		0x7F
-#define CONFIG_SYS_I2C_OFFSET		0x118000
-#define CONFIG_SYS_I2C2_OFFSET		0x118100
+#define CONFIG_SYS_I2C
+#define CONFIG_SYS_I2C_FSL
+#define CONFIG_SYS_FSL_I2C_SPEED	100000
+#define CONFIG_SYS_FSL_I2C_SLAVE	0x7F
+#define CONFIG_SYS_FSL_I2C_OFFSET	0x118000
+#define CONFIG_SYS_FSL_I2C2_SPEED	100000
+#define CONFIG_SYS_FSL_I2C2_SLAVE	0x7F
+#define CONFIG_SYS_FSL_I2C2_OFFSET	0x118100
+
 #define I2C_MUX_PCA_ADDR_PRI		0x77 /* I2C bus multiplexer,primary */
 #define I2C_MUX_PCA_ADDR_SEC		0x76 /* I2C bus multiplexer,secondary */
 
@@ -633,6 +629,16 @@ unsigned long get_board_ddr_clk(void);
 #elif defined(CONFIG_NAND)
 #define CONFIG_SYS_QE_FMAN_FW_IN_NAND
 #define CONFIG_SYS_QE_FMAN_FW_ADDR	(6 * CONFIG_SYS_NAND_BLOCK_SIZE)
+#elif defined(CONFIG_SRIO_PCIE_BOOT_SLAVE)
+/*
+ * Slave has no ucode locally, it can fetch this from remote. When implementing
+ * in two corenet boards, slave's ucode could be stored in master's memory
+ * space, the address can be mapped from slave TLB->slave LAW->
+ * slave SRIO or PCIE outbound window->master inbound window->
+ * master LAW->the ucode address in master's memory space.
+ */
+#define CONFIG_SYS_QE_FMAN_FW_IN_REMOTE
+#define CONFIG_SYS_QE_FMAN_FW_ADDR	0xFFE00000
 #else
 #define CONFIG_SYS_QE_FMAN_FW_IN_NOR
 #define CONFIG_SYS_QE_FMAN_FW_ADDR		0xEFF40000

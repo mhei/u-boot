@@ -5,15 +5,7 @@
  *
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR /PURPOSE.  See the
- * GNU General Public License for more details.
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -37,49 +29,16 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CONFIG_SPL_BUILD
 static struct wd_timer *wdtimer = (struct wd_timer *)WDT_BASE;
-static struct uart_sys *uart_base = (struct uart_sys *)DEFAULT_UART_BASE;
 #endif
 
 static struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
 
 /* UART Defines */
 #ifdef CONFIG_SPL_BUILD
-#define UART_RESET		(0x1 << 1)
-#define UART_CLK_RUNNING_MASK	0x1
-#define UART_SMART_IDLE_EN	(0x1 << 0x3)
-
-static void rtc32k_enable(void)
-{
-	struct rtc_regs *rtc = (struct rtc_regs *)RTC_BASE;
-
-	/*
-	 * Unlock the RTC's registers.  For more details please see the
-	 * RTC_SS section of the TRM.  In order to unlock we need to
-	 * write these specific values (keys) in this order.
-	 */
-	writel(0x83e70b13, &rtc->kick0r);
-	writel(0x95a4f1e0, &rtc->kick1r);
-
-	/* Enable the RTC 32K OSC by setting bits 3 and 6. */
-	writel((1 << 3) | (1 << 6), &rtc->osc);
-}
-
 static void uart_enable(void)
 {
-	u32 regVal;
-
 	/* UART softreset */
-	regVal = readl(&uart_base->uartsyscfg);
-	regVal |= UART_RESET;
-	writel(regVal, &uart_base->uartsyscfg);
-	while ((readl(&uart_base->uartsyssts) &
-		UART_CLK_RUNNING_MASK) != UART_CLK_RUNNING_MASK)
-		;
-
-	/* Disable smart idle */
-	regVal = readl(&uart_base->uartsyscfg);
-	regVal |= UART_SMART_IDLE_EN;
-	writel(regVal, &uart_base->uartsyscfg);
+	uart_soft_reset();
 }
 
 static void wdt_disable(void)

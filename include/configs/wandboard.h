@@ -3,10 +3,7 @@
  *
  * Configuration settings for the Wandboard.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -103,6 +100,8 @@
 
 #if defined(CONFIG_MX6DL)
 #define CONFIG_DEFAULT_FDT_FILE		"imx6dl-wandboard.dtb"
+#elif defined(CONFIG_MX6Q)
+#define CONFIG_DEFAULT_FDT_FILE		"imx6q-wandboard.dtb"
 #elif defined(CONFIG_MX6S)
 #define CONFIG_DEFAULT_FDT_FILE		"imx6s-wandboard.dtb"
 #endif
@@ -118,8 +117,8 @@
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
-	"mmcpart=2\0" \
-	"mmcroot=/dev/mmcblk0p3 rootwait rw\0" \
+	"mmcpart=1\0" \
+	"mmcroot=/dev/mmcblk0p2 rootwait rw\0" \
 	"update_sd_firmware_filename=u-boot.imx\0" \
 	"update_sd_firmware=" \
 		"if test ${ip_dyn} = yes; then " \
