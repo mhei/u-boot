@@ -109,7 +109,6 @@ DECLARE_GLOBAL_DATA_PTR;
 /************************************************************************/
 
 #include <video_font.h>			/* Get font data, width and height */
-#include <video_font_data.h>
 
 #ifdef CONFIG_VIDEO_LOGO
 #include <video_logo.h>			/* Get logo data, width and height */
@@ -1177,7 +1176,7 @@ static void *video_logo (void)
 #ifndef CONFIG_FADS		/* all normal boards */
 	/* leave one blank line */
 
-	sprintf (info, "MPC823 CPU at %s MHz, %ld MB RAM, %ld MB Flash",
+	sprintf(info, "MPC823 CPU at %s MHz, %ld MiB RAM, %ld MiB Flash",
 		strmhz(temp, gd->cpu_clk),
 		gd->ram_size >> 20,
 		gd->bd->bi_flashsize >> 20 );
@@ -1188,7 +1187,7 @@ static void *video_logo (void)
 	video_drawstring (VIDEO_INFO_X, VIDEO_INFO_Y + VIDEO_FONT_HEIGHT,
 					  info);
 
-	sprintf (info, "2MB FLASH - 8MB DRAM - 4MB SRAM");
+	sprintf(info, "2MiB FLASH - 8MiB DRAM - 4MiB SRAM");
 	video_drawstring (VIDEO_INFO_X, VIDEO_INFO_Y + VIDEO_FONT_HEIGHT * 2,
 					  info);
 #endif

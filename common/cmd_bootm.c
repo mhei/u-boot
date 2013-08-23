@@ -636,7 +636,7 @@ static int do_bootm_states(cmd_tbl_t *cmdtp, int flag, int argc,
 			goto err;
 		else if (ret == BOOTM_ERR_OVERLAP)
 			ret = 0;
-#ifdef CONFIG_SILENT_CONSOLE
+#if defined(CONFIG_SILENT_CONSOLE) && !defined(CONFIG_SILENT_U_BOOT_ONLY)
 		if (images->os.os == IH_OS_LINUX)
 			fixup_silent_linux();
 #endif
@@ -1384,9 +1384,19 @@ static void fixup_silent_linux(void)
 	char *buf;
 	const char *env_val;
 	char *cmdline = getenv("bootargs");
+	int want_silent;
 
-	/* Only fix cmdline when requested */
-	if (!(gd->flags & GD_FLG_SILENT))
+	/*
+	 * Only fix cmdline when requested. The environment variable can be:
+	 *
+	 *	no - we never fixup
+	 *	yes - we always fixup
+	 *	unset - we rely on the console silent flag
+	 */
+	want_silent = getenv_yesno("silent_linux");
+	if (want_silent == 0)
+		return;
+	else if (want_silent == -1 && !(gd->flags & GD_FLG_SILENT))
 		return;
 
 	debug("before silent fix-up: %s\n", cmdline);

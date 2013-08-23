@@ -184,7 +184,6 @@ Matthias Fuchs <matthias.fuchs@esd-electronics.com>
 	APC405		PPC405GP
 	AR405		PPC405GP
 	ASH405		PPC405EP
-	CANBT		PPC405CR
 	CPCI2DP		PPC405GP
 	CPCI405		PPC405GP
 	CPCI4052	PPC405GP
@@ -448,6 +447,7 @@ Heiko Schocher <hs@denx.de>
 	cam_enc_4xx	davinci/ARM926EJS
 	charon		MPC5200
 	ids8247		MPC8247
+	ipam390		davinci/ARM926EJS
 	jupiter		MPC5200
 	kmsupx5		MPC8321
 	mucmc52		MPC5200
@@ -471,6 +471,10 @@ Jon Smirl <jonsmirl@gmail.com>
 Ira W. Snyder <iws@ovro.caltech.edu>
 
 	P2020COME	P2020
+
+York Sun <yorksun@freescale.com>
+
+	T4240EMU	T4240
 
 Timur Tabi <timur@freescale.com>
 
@@ -539,6 +543,10 @@ Detlev Zundel <dzu@denx.de>
 
 	inka4x0		MPC5200
 
+Po Liu <po.liu@freescale.com>
+
+	C29XPCIE	C29X
+
 -------------------------------------------------------------------------
 
 Unknown / orphaned boards:
@@ -601,7 +609,6 @@ Jason Liu <r64343@freescale.com>
 	mx53evk         i.MX53
 	mx53loco        i.MX53
 	mx6qarm2	i.MX6Q
-	mx6qsabrelite   i.MX6Q
 
 Enric Balletbo i Serra <eballetbo@iseebcn.com>
 
@@ -944,6 +951,10 @@ Lucas Stach <dev@lynxeye.de>
 
 	colibri_t20_iris	Tegra20 (ARM7 & A9 Dual Core)
 
+Antoine Tenart <atenart@adeneo-embedded.com>
+
+	TI816X		ARM ARMV7 (TI816x Soc)
+
 Nick Thompson <nick.thompson@gefanuc.com>
 
 	da830evm	ARM926EJS (DA830/OMAP-L137)
@@ -1067,6 +1078,7 @@ Pali Rohár <pali.rohar@gmail.com>
 	nokia_rx51	ARM ARMV7 (OMAP34xx SoC)
 
 Eric Nelson <eric.nelson@boundarydevices.com>
+	mx6qsabrelite		i.MX6Q		1GB
 	nitrogen6dl		i.MX6DL		1GB
 	nitrogen6dl2g		i.MX6DL		2GB
 	nitrogen6q		i.MX6Q/6D	1GB
