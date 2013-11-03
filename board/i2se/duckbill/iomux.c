@@ -105,8 +105,8 @@ const iomux_cfg_t iomux_setup[] = {
 	MX28_PAD_EMI_CKE__EMI_CKE | MUX_CONFIG_EMI,
 
 	/* LEDs */
-	MX28_PAD_AUART0_RX__GPIO_3_0,
-	MX28_PAD_AUART0_TX__GPIO_3_1,
+	MX28_PAD_AUART1_RX__GPIO_3_4,
+	MX28_PAD_AUART1_TX__GPIO_3_5,
 };
 
 #define HW_DRAM_CTL29	(0x74 >> 2)

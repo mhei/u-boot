@@ -23,8 +23,8 @@
 #include <errno.h>
 
 #define GPIO_PHY_RESET MX28_PAD_ENET0_RX_CLK__GPIO_4_13
-#define GPIO_LED_GREEN MX28_PAD_AUART0_RX__GPIO_3_0
-#define GPIO_LED_RED   MX28_PAD_AUART0_TX__GPIO_3_1
+#define GPIO_LED_GREEN MX28_PAD_AUART1_RX__GPIO_3_5
+#define GPIO_LED_RED   MX28_PAD_AUART1_TX__GPIO_3_4
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -70,9 +70,7 @@ int board_eth_init(bd_t *bis)
 	ret = cpu_eth_init(bis);
 
 	/* Reset PHY */
-	gpio_direction_output(GPIO_PHY_RESET, 1);
-	udelay(50);
-	gpio_set_value(GPIO_PHY_RESET, 0);
+	gpio_direction_output(GPIO_PHY_RESET, 0);
 	udelay(200);
 	gpio_set_value(GPIO_PHY_RESET, 1);
 
