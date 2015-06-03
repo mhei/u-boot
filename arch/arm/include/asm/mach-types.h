@@ -1108,6 +1108,7 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_KZM9G                4140
 #define MACH_TYPE_COLIBRI_T30          4493
 #define MACH_TYPE_APALIS_T30           4513
+#define MACH_TYPE_DUCKBILL             4754
 
 #ifdef CONFIG_ARCH_EBSA110
 # ifdef machine_arch_type
@@ -14259,6 +14260,18 @@ extern unsigned int __machine_arch_type;
 # define machine_is_apalis_t30()	(machine_arch_type == MACH_TYPE_APALIS_T30)
 #else
 # define machine_is_apalis_t30()	(0)
+#endif
+
+#ifdef CONFIG_MACH_DUCKBILL
+# ifdef machine_arch_type
+#  undef machine_arch_type
+#  define machine_arch_type	__machine_arch_type
+# else
+#  define machine_arch_type	MACH_TYPE_DUCKBILL
+# endif
+# define machine_is_duckbill()	(machine_arch_type == MACH_TYPE_DUCKBILL)
+#else
+# define machine_is_duckbill()	(0)
 #endif
 
 /*
