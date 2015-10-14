@@ -81,23 +81,54 @@
 
 /* Extra Environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"update_sd_firmware_filename=openwrt-mxs-root.ext4\0" \
-	"update_sd_firmware=" \
+	"mmc_part2_offset=1000\0" \
+	"mmc_part3_offset=19000\0" \
+	"update_openwrt_firmware_filename=openwrt-mxs-root.ext4\0" \
+	"update_openwrt_firmware=" \
 		"if mmc rescan; then " \
-		"if tftp ${update_sd_firmware_filename}; then " \
-		"setexpr fw_sz ${filesize} / 200; " \
-		"setexpr fw_sz ${fw_sz} + 1; " \
-		"mmc dev ${mmcdev} 3; " \
-		"mmc write ${loadaddr} 0 ${fw_sz}; " \
-		"mmc dev ${mmcdev} 2; " \
-		"mmc write ${loadaddr} 0 ${fw_sz}; " \
-		"mmc dev ${mmcdev}; " \
-		"fi; " \
+			"if tftp ${update_openwrt_firmware_filename}; then " \
+				"setexpr fw_sz ${filesize} + 1ff; " \
+				"setexpr fw_sz ${fw_sz} / 200; " \
+				"mmc write ${loadaddr} ${mmc_part2_offset} ${fw_sz}; " \
+				"mmc write ${loadaddr} ${mmc_part3_offset} ${fw_sz}; " \
+			"fi; " \
 		"fi\0" \
+	"update_fw_filename_prefix=emmc.img.\0" \
+	"update_fw_filename_suffix=.gz\0" \
+	"update_fw_parts=6\0" \
+	"update_fw_fsize_uncompressed=4000000\0" \
+	"gzwrite_wbuf=100000\0" \
+	"update_emmc_firmware=" \
+		"setexpr i 1; setexpr error 0; " \
+		"while test ${i} -le ${update_fw_parts}; do " \
+			"echo Transfering firmware image part ${i} of ${update_fw_parts}; " \
+			"if test ${i} -le 9; then " \
+				"setenv j 0${i}; " \
+			"else " \
+				"setenv j ${i}; " \
+			"fi; " \
+			"if tftp ${loadaddr} ${update_fw_basedir}${update_fw_filename_prefix}${j}${update_fw_filename_suffix}; then " \
+				"setexpr k ${i} - 1; " \
+				"setexpr offset ${update_fw_fsize_uncompressed} * ${k}; " \
+				"if gzwrite mmc ${mmcdev} ${loadaddr} ${filesize} ${gzwrite_wbuf} ${offset}; then " \
+					"setexpr i ${i} + 1; " \
+				"else " \
+					"setexpr i ${update_fw_parts} + 1; " \
+					"setexpr error 1; " \
+				"fi; " \
+			"else " \
+				"setexpr i ${update_fw_parts} + 1; " \
+				"setexpr error 1; " \
+			"fi; " \
+		"done; setenv i; setenv j; setenv k; setenv fsize; setenv filesize; setenv offset; " \
+		"if test ${error} -eq 1; then " \
+			"echo Firmware Update FAILED; " \
+		"else " \
+			"echo Firmware Update OK; " \
+		"fi; setenv error\0" \
 	"erase_mmc=mmc erase 0 2\0" \
 	"erase_env1=mmc erase 100 100\0" \
 	"erase_env2=mmc erase 200 100\0" \
-	"script=boot.scr\0" \
 	"image=zImage\0" \
 	"console=ttyAMA0\0" \
 	"fdt_file=imx28-duckbill.dtb\0" \
@@ -111,10 +142,6 @@
 	"mmcargs=setenv bootargs console=${console},${baudrate} " \
 		"root=${mmcroot} " \
 		"rootwait bootsys=${bootsys} panic=1\0" \
-	"loadbootscript="  \
-		"fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
-	"bootscript=echo Running bootscript from mmc ...; "	\
-		"source\0" \
 	"loadimage=ext4load mmc ${mmcdev}:${mmcpart} ${loadaddr} /boot/${image}\0" \
 	"loadfdt=ext4load mmc ${mmcdev}:${mmcpart} ${fdt_addr} /boot/${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
@@ -133,7 +160,7 @@
 			"fi; " \
 		"else " \
 			"bootz; " \
-		"fi;\0" \
+		"fi\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/nfs " \
 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
@@ -157,19 +184,19 @@
 			"fi; " \
 		"else " \
 			"bootz; " \
-		"fi;\0"
+		"fi\0"
 
 #define CONFIG_BOOTCOMMAND \
-	"mmc dev ${mmcdev}; if mmc rescan; then " \
-		"if run loadbootscript; then " \
-			"run bootscript; " \
+	"mmc dev ${mmcdev}; " \
+	"if mmc rescan; then " \
+		"if run loadimage; then " \
+			"run mmcboot; " \
 		"else " \
-			"if run loadimage; then " \
-				"run mmcboot; " \
-			"else run netboot; " \
-			"fi; " \
+			"run netboot; " \
 		"fi; " \
-	"else run netboot; fi"
+	"else " \
+		"run netboot; " \
+	"fi"
 
 /* The rest of the configuration is shared */
 #include <configs/mxs.h>
