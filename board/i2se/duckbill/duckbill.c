@@ -17,12 +17,12 @@
 #include <miiphy.h>
 #include <netdev.h>
 #include <errno.h>
-
-#define GPIO_PHY_RESET MX28_PAD_SSP0_DATA7__GPIO_2_7
-#define GPIO_LED_GREEN MX28_PAD_AUART1_TX__GPIO_3_5
-#define GPIO_LED_RED   MX28_PAD_AUART1_RX__GPIO_3_4
+#include <fuse.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+static u32 system_rev;
+static u32 serialno;
 
 /*
  * Functions
@@ -63,14 +63,20 @@ int board_mmc_init(bd_t *bis)
 #ifdef	CONFIG_CMD_NET
 int board_eth_init(bd_t *bis)
 {
+	unsigned int reset_gpio;
 	int ret;
 
 	ret = cpu_eth_init(bis);
 
+	if (system_rev == 1)
+		reset_gpio = MX28_PAD_SSP0_DATA7__GPIO_2_7;
+	else
+		reset_gpio = MX28_PAD_GPMI_ALE__GPIO_0_26;
+
 	/* Reset PHY */
-	gpio_direction_output(GPIO_PHY_RESET, 0);
+	gpio_direction_output(reset_gpio, 0);
 	udelay(200);
-	gpio_set_value(GPIO_PHY_RESET, 1);
+	gpio_set_value(reset_gpio, 1);
 
 	/* give PHY some time to get out of the reset */
 	udelay(10000);
@@ -88,20 +94,60 @@ void mx28_adjust_mac(int dev_id, unsigned char *mac)
 {
 	mac[0] = 0x00;
 	mac[1] = 0x01;
+	mac[2] = 0x87;
+}
+#endif
 
-	if (dev_id == 1) /* Let MAC1 be MAC0 + 1 by default */
-		mac[5] += 1;
+#ifdef CONFIG_REVISION_TAG
+u32 get_board_rev(void)
+{
+	return system_rev;
+}
+#endif
+
+#ifdef CONFIG_SERIAL_TAG
+void get_board_serial(struct tag_serialnr *serialnr)
+{
+	serialnr->low = serialno;
+	serialnr->high = 0;
 }
 #endif
 
 int misc_init_r(void)
 {
-	char *s = getenv("serial#");
+	unsigned int led_red_gpio;
+	char *s;
+
+	/* Board revision detection */
+	gpio_direction_input(MX28_PAD_LCD_D17__GPIO_1_17);
+
+	/* MX28_PAD_LCD_D17__GPIO_1_17: v1 = pull-down, v2 = pull-up */
+	system_rev =
+		gpio_get_value(MX28_PAD_LCD_D17__GPIO_1_17);
+	system_rev += 1;
 
 	/* enable red LED to indicate a running bootloader */
-	gpio_direction_output(GPIO_LED_RED, 1);
+	if (system_rev == 1)
+		led_red_gpio = MX28_PAD_AUART1_RX__GPIO_3_4;
+	else
+		led_red_gpio = MX28_PAD_SAIF0_LRCLK__GPIO_3_21;
+	gpio_direction_output(led_red_gpio, 1);
 
-	puts("Board: I2SE Duckbill\n");
+	if (system_rev == 1)
+		puts("Board: I2SE Duckbill\n");
+	else
+		printf("Board: I2SE Duckbill v%u\n", system_rev);
+
+#ifdef CONFIG_MXS_OCOTP
+	if (fuse_read(0, 3, &serialno) == 0 && serialno != 0) {
+		setenv_ulong("serial#", serialno);
+	} else {
+		printf("Duckbill: Can't get serial from OCOTP\n");
+		serialno = 0;
+	}
+#endif
+
+	s = getenv("serial#");
 	if (s && s[0]) {
 		puts("Serial: ");
 		puts(s);

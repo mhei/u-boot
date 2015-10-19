@@ -9,6 +9,7 @@
 #include <common.h>
 #include <config.h>
 #include <asm/io.h>
+#include <asm/gpio.h>
 #include <asm/arch/iomux-mx28.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/sys_proto.h>
@@ -17,12 +18,13 @@
 #define	MUX_CONFIG_ENET	(MXS_PAD_3V3 | MXS_PAD_8MA | MXS_PAD_PULLUP)
 #define	MUX_CONFIG_EMI	(MXS_PAD_3V3 | MXS_PAD_12MA | MXS_PAD_NOPULL)
 
+/* For all revisions */
 const iomux_cfg_t iomux_setup[] = {
 	/* DUART */
 	MX28_PAD_PWM0__DUART_RX,
 	MX28_PAD_PWM1__DUART_TX,
 
-	/* SD card */
+	/* eMMC (v2) or SD card (v1) */
 	MX28_PAD_SSP0_DATA0__SSP0_D0 | MUX_CONFIG_SSP0,
 	MX28_PAD_SSP0_DATA1__SSP0_D1 | MUX_CONFIG_SSP0,
 	MX28_PAD_SSP0_DATA2__SSP0_D2 | MUX_CONFIG_SSP0,
@@ -43,10 +45,6 @@ const iomux_cfg_t iomux_setup[] = {
 	MX28_PAD_ENET0_TXD0__ENET0_TXD0 | MUX_CONFIG_ENET,
 	MX28_PAD_ENET0_TXD1__ENET0_TXD1 | MUX_CONFIG_ENET,
 	MX28_PAD_ENET_CLK__CLKCTRL_ENET | MUX_CONFIG_ENET,
-
-	/* PHY reset */
-	MX28_PAD_SSP0_DATA7__GPIO_2_7 |
-		(MXS_PAD_4MA | MXS_PAD_3V3 | MXS_PAD_PULLUP),
 
 	/* EMI */
 	MX28_PAD_EMI_D00__EMI_DATA0 | MUX_CONFIG_EMI,
@@ -100,9 +98,36 @@ const iomux_cfg_t iomux_setup[] = {
 	MX28_PAD_EMI_CE1N__EMI_CE1N | MUX_CONFIG_EMI,
 	MX28_PAD_EMI_CKE__EMI_CKE | MUX_CONFIG_EMI,
 
+	/* Revision pin(s) */
+	MX28_PAD_LCD_D17__GPIO_1_17,
+};
+
+/* For revision 1 only */
+const iomux_cfg_t iomux_setup_v1[] = {
+	/* PHY reset */
+	MX28_PAD_SSP0_DATA7__GPIO_2_7 |
+		(MXS_PAD_4MA | MXS_PAD_3V3 | MXS_PAD_PULLUP),
+
 	/* LEDs */
 	MX28_PAD_AUART1_RX__GPIO_3_4,
 	MX28_PAD_AUART1_TX__GPIO_3_5,
+};
+
+/* For revision 2 only */
+const iomux_cfg_t iomux_setup_v2[] = {
+	/* eMMC (v2) */
+	MX28_PAD_SSP0_DATA4__SSP0_D4 | MUX_CONFIG_SSP0,
+	MX28_PAD_SSP0_DATA5__SSP0_D5 | MUX_CONFIG_SSP0,
+	MX28_PAD_SSP0_DATA6__SSP0_D6 | MUX_CONFIG_SSP0,
+	MX28_PAD_SSP0_DATA7__SSP0_D7 | MUX_CONFIG_SSP0,
+
+	/* PHY reset */
+	MX28_PAD_GPMI_ALE__GPIO_0_26 |
+		(MXS_PAD_4MA | MXS_PAD_3V3 | MXS_PAD_PULLUP),
+
+	/* LEDs */
+	MX28_PAD_SAIF0_LRCLK__GPIO_3_21,
+	MX28_PAD_SAIF0_MCLK__GPIO_3_20,
 };
 
 #define HW_DRAM_CTL29	(0x74 >> 2)
@@ -122,4 +147,11 @@ void mxs_adjust_memory_params(uint32_t *dram_vals)
 void board_init_ll(const uint32_t arg, const uint32_t *resptr)
 {
 	mxs_common_spl_init(arg, resptr, iomux_setup, ARRAY_SIZE(iomux_setup));
+
+	gpio_direction_input(MX28_PAD_LCD_D17__GPIO_1_17);
+
+	if (gpio_get_value(MX28_PAD_LCD_D17__GPIO_1_17))
+		mxs_iomux_setup_multiple_pads(iomux_setup_v2, ARRAY_SIZE(iomux_setup_v2));
+	else
+		mxs_iomux_setup_multiple_pads(iomux_setup_v1, ARRAY_SIZE(iomux_setup_v1));
 }
