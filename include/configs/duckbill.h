@@ -134,7 +134,7 @@
 	"erase_env2=mmc erase 200 100\0" \
 	"image=zImage\0" \
 	"console=ttyAMA0\0" \
-	"fdt_file=imx28-duckbill.dtb\0" \
+	"fdt_file=imx28-duckbill-2.dtb\0" \
 	"fdt_addr=0x41000000\0" \
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \

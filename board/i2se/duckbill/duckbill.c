@@ -166,7 +166,7 @@ int misc_init_r(void)
 	if (system_rev == 1)
 		puts("Board: I2SE Duckbill\n");
 	else
-		printf("Board: I2SE Duckbill v%u\n", system_rev);
+		puts("Board: I2SE Duckbill 2\n");
 
 	serialno = getenv_ulong("serial#", 10, 0);
 	s = getenv("serial#");
