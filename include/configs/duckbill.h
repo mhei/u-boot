@@ -102,8 +102,8 @@
 	"update_fw_fsize_uncompressed=4000000\0" \
 	"gzwrite_wbuf=100000\0" \
 	"update_emmc_firmware=" \
-		"setexpr i 1; setexpr error 0; " \
-		"while itest ${i} -le ${update_fw_parts}; do " \
+		"setexpr i ${update_fw_parts}; setexpr error 0; " \
+		"while itest ${i} -gt 0; do " \
 			"echo Transfering firmware image part ${i} of ${update_fw_parts}; " \
 			"if itest ${i} -le 9; then " \
 				"setenv j 0${i}; " \
@@ -114,13 +114,13 @@
 				"setexpr k ${i} - 1; " \
 				"setexpr offset ${update_fw_fsize_uncompressed} * ${k}; " \
 				"if gzwrite mmc ${mmcdev} ${loadaddr} ${filesize} ${gzwrite_wbuf} ${offset}; then " \
-					"setexpr i ${i} + 1; " \
+					"setexpr i ${i} - 1; " \
 				"else " \
-					"setexpr i ${update_fw_parts} + 1; " \
+					"setexpr i 0; " \
 					"setexpr error 1; " \
 				"fi; " \
 			"else " \
-				"setexpr i ${update_fw_parts} + 1; " \
+				"setexpr i 0; " \
 				"setexpr error 1; " \
 			"fi; " \
 		"done; setenv i; setenv j; setenv k; setenv fsize; setenv filesize; setenv offset; " \
