@@ -81,6 +81,14 @@
 #define CONFIG_REVISION_TAG
 #define CONFIG_SERIAL_TAG
 #define CONFIG_OF_BOARD_SETUP
+#define CONFIG_BOOT_RETRY_TIME		120	/* retry autoboot after 120 seconds */
+#define CONFIG_BOOT_RETRY_TIME_MIN	1	/* can go down to 1 second */
+#define CONFIG_AUTOBOOT_KEYED
+#define CONFIG_AUTOBOOT_PROMPT		"Autobooting in %d seconds, " \
+					"press <c> to stop\n"
+#define CONFIG_AUTOBOOT_DELAY_STR	"\x63"	/* allows retry after retry time */
+#define CONFIG_AUTOBOOT_STOP_STR	" "	/* stop autoboot with <Space> */
+#define CONFIG_RESET_TO_RETRY			/* reset board to retry booting */
 
 /* Extra Environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
